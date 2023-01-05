@@ -1,0 +1,8 @@
+node_modules
+dist
+tmp
+.env
+yarn.lock
+package-lock.json
+public/uploads
+public/export
