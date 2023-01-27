@@ -2,6 +2,7 @@ import express from 'express';
 import { login } from '../../controllers/api/authentication';
 import { loginValidation } from './../../middleware/validator/auth';
 import userRoute from './users';
+import authRoute from './auth';
 import driverRoute from './driver';
 import transportationRoute from './transportation';
 import wasteRoute from './waste';
@@ -12,6 +13,7 @@ import verifyToken from '../../middleware/authenticate';
 const router = express.Router();
 
 router.post('/login', loginValidation(), login);
+router.use('/auth', [verifyToken], authRoute);
 
 /* Router */
 router.use('/users', [verifyToken], userRoute);

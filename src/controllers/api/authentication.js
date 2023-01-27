@@ -84,3 +84,57 @@ export const login = async (req, res) => {
         res.end();
     }
 }
+
+export const getUserProfile = async (req, res) => {
+    // RESPONSE
+    let response = {}
+    let statusCode = 500;
+
+    // CREATE TYPEORM CONNECTION
+    const connection = getManager();
+
+    // USERS
+    let {
+        polda_id,
+        polres_id,
+        role,
+        id
+    } = req.user;
+
+    try {
+        let query = connection.createQueryBuilder(Users, 'u')
+            .select([
+                `u.id AS id`,
+                `u.email AS email`,
+                `u.first_name AS first_name`,
+                `u.last_name AS last_name`,
+                `u.active AS active`,
+                `u.created_at AS created_at`,
+                `u.updated_at AS updated_at`
+            ])
+            .leftJoinAndSelect('u.roles', 'roles')
+            .where('u.id = :id', { id: id });
+
+        let report = await query
+            .getRawOne();
+
+        if (!report) {
+            statusCode = 404;
+            throw new Error("Profile User tidak ditemukan.");
+        }
+
+        response = responseSuccess(200, "Success!", report);
+
+        res.status(response.meta.code).send(response);
+        res.end();
+    } catch (error) {
+        if (statusCode != 500) {
+            response = responseError(statusCode, error);
+        } else {
+            console.log('ERROR: ', error);
+            response = responseError(500, 'Terjadi kesalahan pada server.')
+        }
+        res.status(response.meta.code).send(response);
+        res.end();
+    }
+}
