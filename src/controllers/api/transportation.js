@@ -155,7 +155,7 @@ export const getDetailTransportation = async (req, res) => {
             id
         } = req.params;
 
-        let query = connection.createQueryBuilder(Transportation, 'd')
+        let query = connection.createQueryBuilder(Transportation, 't')
             .select([
                 `t.id AS id`,
                 `t.name AS name`,
@@ -169,8 +169,8 @@ export const getDetailTransportation = async (req, res) => {
                 `tp.name AS transportation_type`,
             ])
             .leftJoin(TransportationType, 'tp', 'tp.id = t.transportation_type_id')
-            .where('d.deleted_at IS NULL')
-            .andWhere('d.id = :id', { id: id });
+            .where('t.deleted_at IS NULL')
+            .andWhere('t.id = :id', { id: id });
 
         let report = await query
             .getRawOne();
