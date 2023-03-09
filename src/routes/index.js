@@ -3,6 +3,6 @@ import apiRouter from './api';
 
 const router = express.Router();
 
-router.use('/api', apiRouter);
+router.use('/b3/api', apiRouter);
 
 module.exports = router;

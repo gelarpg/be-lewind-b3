@@ -5,6 +5,8 @@ import moment from "moment";
 import TransportationType from "../../entity/transportation_type";
 import Transportation from "../../entity/transportation";
 import TransportationDocuments from "../../entity/transportation_documents";
+import { checkAndCreateDirectory } from "../../middleware/helper";
+import fs from 'fs';
 
 export const getListTransportationType = async (req, res) => {
     // RESPONSE
@@ -180,6 +182,21 @@ export const getDetailTransportation = async (req, res) => {
             throw new Error("Data tidak ditemukan.");
         }
 
+        let documents = await connection.createQueryBuilder(TransportationDocuments, 'td')
+            .select([
+                `td.id AS id`,
+                `td.type AS type`,
+                `td.path AS path`,
+                `td.doc_number AS doc_number`,
+                `td.created_at AS created_at`,
+                `td.updated_at AS updated_at`
+            ])
+            .where('td.deleted_at IS NULL')
+            .andWhere('td.transportation_id = :tid', { tid: report.id })
+            .getRawMany();
+
+        report['documents'] = documents;
+
         response = responseSuccess(200, "Success!", report);
 
         res.status(response.meta.code).send(response);
@@ -243,6 +260,50 @@ export const createTransportation = async (req, res) => {
         if (!storeTransportation) {
             throw new Error('Fail to create data.');
         }
+
+        // MAPPING TRANSPORTATION DOCUMENT
+        let transaportation_documents = [];
+        let directory = `public/api/upload/attachments/transportation`;
+        let directoryResult = `/api/upload/attachments/transportation`;
+
+        checkAndCreateDirectory(directory);
+
+        // STNK
+        let stnk_file = body.stnk_file;
+        let stnk_file_name = stnk_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        fs.renameSync('./tmp/' + stnk_file, directory + '/' + stnk_file_name);
+
+        transaportation_documents.push({
+            transportation_id: storeTransportation.id,
+            type: 'stnk',
+            doc_number: body.stnk_number,
+            path: directoryResult + '/' + stnk_file_name,
+            created_at: moment(),
+            updated_at: moment()
+        });
+
+        // Travel Document
+        let travel_document_file = body.travel_document_file;
+        let travel_document_file_name = travel_document_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        fs.renameSync('./tmp/' + travel_document_file, directory + '/' + travel_document_file_name);
+
+        transaportation_documents.push({
+            transportation_id: storeTransportation.id,
+            type: 'travel_document',
+            doc_number: body.travel_document_number,
+            path: directoryResult + '/' + travel_document_file_name,
+            created_at: moment(),
+            updated_at: moment()
+        });
+
+        let storeTransportationDocuments = await queryRunner.manager
+            .getRepository(TransportationDocuments)
+            .save(transaportation_documents);
+
+        if (!storeTransportationDocuments) {
+            throw new Error('Fail to create data.');
+        }
+
 
         // COMMIT TRANSACTION
         await queryRunner.commitTransaction();

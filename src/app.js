@@ -32,31 +32,10 @@ let corsOptionsDelegate = function (req, callback) {
 // Init schedule
 // scheduleFunction.initScheduledJobs();
 app.use(cors(corsOptionsDelegate));
-// view engine setup
-const pathViews = 'views';
-app.set('views', path.join(__dirname, pathViews));
-app.set('view engine', 'jade');
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(session({
-  secret: 'TIPIDKOR%20CORP^#$5sX(Hf6KUo!#65^',
-  name: 'TIPIDKOR%20CORP',
-  resave: false,
-  saveUninitialized: true,
-  httpOnly: true,
-  secure: true,
-  ephemeral: true,
-  rolling: true,
-  cookie: {
-    // maxAge: 1000 * 60 * 60 * 24, // 24 hour
-    maxAge: 99999999,
-    // expires: new Date(Date.now() + (1000 * 60 * 60 * 1)).getTime(),
-    httpOnly: true
-  }
-}));
 
 app.use(express.static(path.join(__dirname, '../public')));
 
@@ -65,15 +44,24 @@ app.use('/', indexRouter);
 
 // error handler
 app.use(function (err, req, res, next) {
-  // render error csrf
-  if (err.code !== 'EBADCSRFTOKEN') return next(err)
-  // set locals, only providing error in development
-  res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
+  let statusCode = err.status || 500;
+  let message = "Terjadi kesalahan pada server!";
 
+  if (statusCode === 500) {
+    console.log(err);
+  } else {
+    message = err.message;
+  }
+
+  res.status(statusCode);
+  res.send({
+    meta: {
+      code: statusCode,
+      success: false,
+      message: message
+    }
+  });
+});
 module.exports = app;

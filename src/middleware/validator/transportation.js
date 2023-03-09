@@ -1,4 +1,5 @@
 import { check } from 'express-validator';
+import fs from 'fs';
 
 const createTransportationValidation = () => {
     return [
@@ -9,6 +10,34 @@ const createTransportationValidation = () => {
         check('year', 'Tahun Kendaraan harus berupa number').isNumeric(),
         check('capacity', 'Kapasitas harus diisi').notEmpty(),
         check('fuel_type', 'Jenis Bahan Bakar harus dipilih').notEmpty(),
+        check('stnk_number', 'No STNK Kendaraan harus diisi').notEmpty(),
+        check('stnk_file').custom((value, { req }) => {
+            // Validate file value
+            if (!value) {
+                return Promise.reject('File STNK harus diisi');
+            }
+
+            // Validate file exist
+            if (!fs.existsSync('./tmp/' + value)) {
+                return Promise.reject(`File STNK tidak tersedia.`);
+            }
+
+            return true;
+        }),
+        check('travel_document_number', 'Surat Jalan harus diisi').notEmpty(),
+        check('travel_document_file').custom((value, { req }) => {
+            // Validate file value
+            if (!value) {
+                return Promise.reject('File Surat Jalan harus diisi');
+            }
+
+            // Validate file exist
+            if (!fs.existsSync('./tmp/' + value)) {
+                return Promise.reject(`File Surat Jalan tidak tersedia.`);
+            }
+
+            return true;
+        }),
     ]
 }
 
