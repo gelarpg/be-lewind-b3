@@ -263,8 +263,8 @@ export const createTransportation = async (req, res) => {
 
         // MAPPING TRANSPORTATION DOCUMENT
         let transaportation_documents = [];
-        let directory = `public/api/upload/attachments/transportation`;
-        let directoryResult = `/api/upload/attachments/transportation`;
+        let directory = `public/api/upload/attachments/transportation/${storeTransportation.id}`;
+        let directoryResult = `/api/upload/attachments/transportation/${storeTransportation.id}`;
 
         checkAndCreateDirectory(directory);
 
@@ -383,6 +383,49 @@ export const updateTransportation = async (req, res) => {
         if (!updateTransportation) {
             throw new Error('Fail to update data.');
         }
+
+        // // MAPPING TRANSPORTATION DOCUMENT
+        // let transaportation_documents = [];
+        // let directory = `public/api/upload/attachments/transportation`;
+        // let directoryResult = `/api/upload/attachments/transportation`;
+
+        // checkAndCreateDirectory(directory);
+
+        // // STNK
+        // let stnk_file = body.stnk_file;
+        // let stnk_file_name = stnk_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        // fs.renameSync('./tmp/' + stnk_file, directory + '/' + stnk_file_name);
+
+        // transaportation_documents.push({
+        //     transportation_id: storeTransportation.id,
+        //     type: 'stnk',
+        //     doc_number: body.stnk_number,
+        //     path: directoryResult + '/' + stnk_file_name,
+        //     created_at: moment(),
+        //     updated_at: moment()
+        // });
+
+        // // Travel Document
+        // let travel_document_file = body.travel_document_file;
+        // let travel_document_file_name = travel_document_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        // fs.renameSync('./tmp/' + travel_document_file, directory + '/' + travel_document_file_name);
+
+        // transaportation_documents.push({
+        //     transportation_id: storeTransportation.id,
+        //     type: 'travel_document',
+        //     doc_number: body.travel_document_number,
+        //     path: directoryResult + '/' + travel_document_file_name,
+        //     created_at: moment(),
+        //     updated_at: moment()
+        // });
+
+        // let storeTransportationDocuments = await queryRunner.manager
+        //     .getRepository(TransportationDocuments)
+        //     .save(transaportation_documents);
+
+        // if (!storeTransportationDocuments) {
+        //     throw new Error('Fail to create data.');
+        // }
 
         // COMMIT TRANSACTION
         await queryRunner.commitTransaction();

@@ -4,6 +4,9 @@ import Driver from "../../entity/driver";
 import { responseError, responseSuccess } from "../../utils/response";
 import { validate } from '../../middleware/validator';
 import moment from "moment";
+import DriverDocuments from "../../entity/driver_documents";
+import fs from 'fs';
+import { checkAndCreateDirectory } from "../../middleware/helper";
 
 export const getListDriver = async (req, res) => {
     // RESPONSE
@@ -127,6 +130,21 @@ export const getDetailDriver = async (req, res) => {
             throw new Error("Data tidak ditemukan.");
         }
 
+        let documents = await connection.createQueryBuilder(DriverDocuments, 'dd')
+            .select([
+                `dd.id AS id`,
+                `dd.type AS type`,
+                `dd.path AS path`,
+                `dd.doc_number AS doc_number`,
+                `dd.created_at AS created_at`,
+                `dd.updated_at AS updated_at`
+            ])
+            .where('dd.deleted_at IS NULL')
+            .andWhere('dd.driver_id = :tid', { tid: report.id })
+            .getRawMany();
+
+        report['documents'] = documents;
+
         response = responseSuccess(200, "Success!", report);
 
         res.status(response.meta.code).send(response);
@@ -186,6 +204,49 @@ export const createDriver = async (req, res) => {
             .save(data);
 
         if (!storeDriver) {
+            throw new Error('Fail to create data.');
+        }
+
+        // MAPPING DRIVER DOCUMENT
+        let driver_documents = [];
+        let directory = `public/api/upload/attachments/driver/${storeDriver.id}`;
+        let directoryResult = `/api/upload/attachments/driver/${storeDriver.id}`;
+
+        checkAndCreateDirectory(directory);
+
+        // KTP
+        let ktp_file = body.ktp_file;
+        let ktp_file_name = ktp_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        fs.renameSync('./tmp/' + ktp_file, directory + '/' + ktp_file_name);
+
+        driver_documents.push({
+            driver_id: storeDriver.id,
+            type: 'ktp',
+            doc_number: body.ktp_number,
+            path: directoryResult + '/' + ktp_file_name,
+            created_at: moment(),
+            updated_at: moment()
+        });
+
+        // SIM
+        let sim_file = body.sim_file;
+        let sim_file_name = sim_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        fs.renameSync('./tmp/' + sim_file, directory + '/' + sim_file_name);
+
+        driver_documents.push({
+            driver_id: storeDriver.id,
+            type: 'sim',
+            doc_number: body.sim_number,
+            path: directoryResult + '/' + sim_file_name,
+            created_at: moment(),
+            updated_at: moment()
+        });
+
+        let storeDriverDocuments = await queryRunner.manager
+            .getRepository(DriverDocuments)
+            .save(driver_documents);
+
+        if (!storeDriverDocuments) {
             throw new Error('Fail to create data.');
         }
 
@@ -265,6 +326,49 @@ export const updateDriver = async (req, res) => {
         if (!updateDriver) {
             throw new Error('Fail to update data.');
         }
+
+        // // MAPPING DRIVER DOCUMENT
+        // let driver_documents = [];
+        // let directory = `public/api/upload/attachments/driver`;
+        // let directoryResult = `/api/upload/attachments/driver`;
+
+        // checkAndCreateDirectory(directory);
+
+        // // KTP
+        // let ktp_file = body.ktp_file;
+        // let ktp_file_name = ktp_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        // fs.renameSync('./tmp/' + ktp_file, directory + '/' + ktp_file_name);
+
+        // driver_documents.push({
+        //     driver_id: updateDriver.id,
+        //     type: 'ktp',
+        //     doc_number: body.ktp_number,
+        //     path: directoryResult + '/' + ktp_file_name,
+        //     created_at: moment(),
+        //     updated_at: moment()
+        // });
+
+        // // SIM
+        // let sim_file = body.sim_file;
+        // let sim_file_name = sim_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        // fs.renameSync('./tmp/' + sim_file, directory + '/' + sim_file_name);
+
+        // driver_documents.push({
+        //     driver_id: updateDriver.id,
+        //     type: 'sim',
+        //     doc_number: body.sim_number,
+        //     path: directoryResult + '/' + sim_file_name,
+        //     created_at: moment(),
+        //     updated_at: moment()
+        // });
+
+        // let updateDriverDocuments = await queryRunner.manager
+        //     .getRepository(DriverDocuments)
+        //     .save(driver_documents);
+
+        // if (!updateDriverDocuments) {
+        //     throw new Error('Fail to update data.');
+        // }
 
         // COMMIT TRANSACTION
         await queryRunner.commitTransaction();

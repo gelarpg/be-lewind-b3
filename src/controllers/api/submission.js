@@ -9,6 +9,9 @@ import Waste from "../../entity/waste";
 import Driver from "../../entity/driver";
 import Clients from "../../entity/clients";
 import SubmissionStatus from "../../entity/submission_status";
+import SubmissionDocuments from "../../entity/submission_documents";
+import { checkAndCreateDirectory } from "../../middleware/helper";
+import fs from 'fs';
 
 export const getListSubmissionStatus = async (req, res) => {
     // RESPONSE
@@ -189,6 +192,21 @@ export const getDetailSubmission = async (req, res) => {
             throw new Error("Data tidak ditemukan.");
         }
 
+        let documents = await connection.createQueryBuilder(SubmissionDocuments, 'sd')
+            .select([
+                `sd.id AS id`,
+                `sd.type AS type`,
+                `sd.path AS path`,
+                `sd.doc_number AS doc_number`,
+                `sd.created_at AS created_at`,
+                `sd.updated_at AS updated_at`
+            ])
+            .where('sd.deleted_at IS NULL')
+            .andWhere('sd.submission_id = :sid', { sid: report.id })
+            .getRawMany();
+
+        report['documents'] = documents;
+
         response = responseSuccess(200, "Success!", report);
 
         res.status(response.meta.code).send(response);
@@ -249,6 +267,119 @@ export const createSubmission = async (req, res) => {
             .save(data);
 
         if (!storeSubmission) {
+            throw new Error('Fail to create data.');
+        }
+
+        // MAPPING DRIVER DOCUMENT
+        let submission_documents = [];
+        let directory = `public/api/upload/attachments/submission/${storeSubmission.id}`;
+        let directoryResult = `/api/upload/attachments/submission/${storeSubmission.id}`;
+
+        checkAndCreateDirectory(directory);
+
+        // Service Fee Document
+        let service_fee_file = body.service_fee_file;
+        let service_fee_file_name = service_fee_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        fs.renameSync('./tmp/' + service_fee_file, directory + '/' + service_fee_file_name);
+
+        submission_documents.push({
+            submission_id: storeSubmission.id,
+            type: 'service_fee',
+            doc_number: '-',
+            path: directoryResult + '/' + service_fee_file_name,
+            created_at: moment(),
+            updated_at: moment()
+        });
+
+        // Invoice
+        let invoice_file = body.invoice_file;
+        let invoice_file_name = invoice_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        fs.renameSync('./tmp/' + invoice_file, directory + '/' + invoice_file_name);
+
+        submission_documents.push({
+            submission_id: storeSubmission.id,
+            type: 'invoice',
+            doc_number: '-',
+            path: directoryResult + '/' + invoice_file_name,
+            created_at: moment(),
+            updated_at: moment()
+        });
+
+        // Provider
+        let provider_file = body.provider_file;
+        let provider_file_name = provider_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        fs.renameSync('./tmp/' + provider_file, directory + '/' + provider_file_name);
+
+        submission_documents.push({
+            submission_id: storeSubmission.id,
+            type: 'provider',
+            doc_number: '-',
+            path: directoryResult + '/' + provider_file_name,
+            created_at: moment(),
+            updated_at: moment()
+        });
+
+        // Transporter
+        let transporter_file = body.transporter_file;
+        let transporter_file_name = transporter_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        fs.renameSync('./tmp/' + transporter_file, directory + '/' + transporter_file_name);
+
+        submission_documents.push({
+            submission_id: storeSubmission.id,
+            type: 'transporter',
+            doc_number: '-',
+            path: directoryResult + '/' + transporter_file_name,
+            created_at: moment(),
+            updated_at: moment()
+        });
+
+        // Waste Receipt
+        let waste_receipt_file = body.waste_receipt_file;
+        let waste_receipt_file_name = waste_receipt_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        fs.renameSync('./tmp/' + waste_receipt_file, directory + '/' + waste_receipt_file_name);
+
+        submission_documents.push({
+            submission_id: storeSubmission.id,
+            type: 'waste_receipt',
+            doc_number: '-',
+            path: directoryResult + '/' + waste_receipt_file_name,
+            created_at: moment(),
+            updated_at: moment()
+        });
+
+        // BAST
+        let bast_file = body.bast_file;
+        let bast_file_name = bast_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        fs.renameSync('./tmp/' + bast_file, directory + '/' + bast_file_name);
+
+        submission_documents.push({
+            submission_id: storeSubmission.id,
+            type: 'bast',
+            doc_number: '-',
+            path: directoryResult + '/' + bast_file_name,
+            created_at: moment(),
+            updated_at: moment()
+        });
+
+        // Travel Document
+        let travel_document_file = body.travel_document_file;
+        let travel_document_file_name = travel_document_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        fs.renameSync('./tmp/' + travel_document_file, directory + '/' + travel_document_file_name);
+
+        submission_documents.push({
+            submission_id: storeSubmission.id,
+            type: 'travel_document',
+            doc_number: '-',
+            path: directoryResult + '/' + travel_document_file_name,
+            created_at: moment(),
+            updated_at: moment()
+        });
+
+        let storeSubmissionDocuments = await queryRunner.manager
+            .getRepository(SubmissionDocuments)
+            .save(submission_documents);
+
+        if (!storeSubmissionDocuments) {
             throw new Error('Fail to create data.');
         }
 

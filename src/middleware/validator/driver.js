@@ -1,4 +1,5 @@
 import { check } from 'express-validator';
+import fs from 'fs';
 
 const createDriverValidation = () => {
     return [
@@ -7,6 +8,34 @@ const createDriverValidation = () => {
         check('age', 'Umur harus berupa number').isNumeric(),
         check('phone_number', 'Nomor Telepon harus diisi').notEmpty(),
         check('address', 'Alamat harus dipilih').notEmpty(),
+        check('ktp_number', 'NIK harus diisi').notEmpty(),
+        check('ktp_file').custom((value, { req }) => {
+            // Validate file value
+            if (!value) {
+                return Promise.reject('File KTP harus diisi');
+            }
+
+            // Validate file exist
+            if (!fs.existsSync('./tmp/' + value)) {
+                return Promise.reject(`File KTP tidak tersedia.`);
+            }
+
+            return true;
+        }),
+        check('sim_number', 'NIK harus diisi').notEmpty(),
+        check('sim_file').custom((value, { req }) => {
+            // Validate file value
+            if (!value) {
+                return Promise.reject('File SIM harus diisi');
+            }
+
+            // Validate file exist
+            if (!fs.existsSync('./tmp/' + value)) {
+                return Promise.reject(`File SIM tidak tersedia.`);
+            }
+
+            return true;
+        }),
     ]
 }
 
