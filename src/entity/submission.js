@@ -28,7 +28,9 @@ const Submission = new EntitySchema({
             type: "double precision"
         },
         status: {
-            type: "boolean"
+            type: "integer",
+            default: null,
+            nullable: true
         },
         created_at: {
             type: "timestamp",

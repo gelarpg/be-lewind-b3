@@ -89,6 +89,7 @@ export const getListSubmission = async (req, res) => {
                 `s.period AS period`,
                 `s.service_fee AS service_fee`,
                 `s.status AS status`,
+                `ss.name AS status_name`,
                 `s.created_at AS created_at`,
                 `s.updated_at AS updated_at`,
                 `c.name AS client_name`,
@@ -100,6 +101,7 @@ export const getListSubmission = async (req, res) => {
             .leftJoin(Waste, 'w', 'w.id = c.waste_id')
             .leftJoin(Driver, 'd', 'd.id = s.driver_id')
             .leftJoin(Transportation, 't', 't.id = s.transportation_id')
+            .leftJoin(SubmissionStatus, 'ss', 'ss.id = s.status')
             .where('s.deleted_at IS NULL');
 
         let report = await query
