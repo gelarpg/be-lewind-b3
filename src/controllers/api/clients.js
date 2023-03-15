@@ -114,6 +114,7 @@ export const getDetailClients = async (req, res) => {
                 `c.transaction_fee AS transaction_fee`,
                 `c.created_at AS created_at`,
                 `c.updated_at AS updated_at`,
+                `w.id AS waste_id`,
                 `w.name AS waste_name`,
                 `w.type AS waste_type`,
                 `w.weight_unit AS waste_weight_unit`,

@@ -174,9 +174,13 @@ export const getDetailSubmission = async (req, res) => {
                 `s.status AS status`,
                 `s.created_at AS created_at`,
                 `s.updated_at AS updated_at`,
+                `c.id AS client_id`,
                 `c.name AS client_name`,
+                `d.id AS driver_id`,
                 `d.name AS driver_name`,
+                `t.id AS transportation_id`,
                 `t.name AS transportation_name`,
+                `w.id AS waste_id`,
                 `w.name AS waste_name`
             ])
             .leftJoin(Clients, 'c', 'c.id = s.client_id')

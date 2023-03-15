@@ -169,6 +169,7 @@ export const getDetailTransportation = async (req, res) => {
                 `t.created_at AS created_at`,
                 `t.updated_at AS updated_at`,
                 `tp.name AS transportation_type`,
+                `tp.id AS transportation_type_id`,
             ])
             .leftJoin(TransportationType, 'tp', 'tp.id = t.transportation_type_id')
             .where('t.deleted_at IS NULL')
