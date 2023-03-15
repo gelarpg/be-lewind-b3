@@ -176,6 +176,7 @@ export const getDetailSubmission = async (req, res) => {
                 `s.updated_at AS updated_at`,
                 `c.id AS client_id`,
                 `c.name AS client_name`,
+                `c.address AS client_address`,
                 `d.id AS driver_id`,
                 `d.name AS driver_name`,
                 `t.id AS transportation_id`,
