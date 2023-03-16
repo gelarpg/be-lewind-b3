@@ -17,6 +17,11 @@ var https = require('https');
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
+var options = {
+  // key: fs.readFileSync('/etc/ssl/api-bitode.key'),
+  // cert: fs.readFileSync('/etc/ssl/api-bitode.lpkbitode-so.com.crt'),
+  // ca: fs.readFileSync('/etc/ssl/api-bitode.lpkbitode-so.com_chain.crt')
+};
 
 app.use((req, res, next) => {
   if (req.headers['x-forwarded-proto'] == 'http') {
