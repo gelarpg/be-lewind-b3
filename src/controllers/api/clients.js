@@ -39,8 +39,11 @@ export const getListClients = async (req, res) => {
                 `c.offer_number AS offer_number`,
                 `c.transaction_fee AS transaction_fee`,
                 `c.created_at AS created_at`,
-                `c.updated_at AS updated_at`
+                `c.updated_at AS updated_at`,
+                `w.name AS waste_name`,
+                `w.type AS waste_type`,
             ])
+            .leftJoin(Waste, 'w', 'w.id = c.waste_id')
             .where('c.deleted_at IS NULL');
 
         let report = await query

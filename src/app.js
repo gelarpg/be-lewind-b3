@@ -17,7 +17,8 @@ const config = process.env;
 
 const whitelistDomain = [
   'http://localhost:3000',
-  'http://103.107.100.20'
+  'http://103.107.100.59',
+  'https://lewindgroup.com'
 ]
 let corsOptionsDelegate = function (req, callback) {
   let corsOptions;
