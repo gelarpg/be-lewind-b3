@@ -1,29 +1,22 @@
 #!/usr/bin/env node
-
+import "reflect-metadata";
+import seeder from '../seeder';
 /**
  * Module dependencies.
  */
 import { createConnection } from "typeorm";
-import "regenerator-runtime/runtime.js";
-
-import app from '../app';
-import http from 'http';
-import https from 'https';
-
-const debug = require('debug')('lms:server');
+var app = require('../app');
+var debug = require('debug')('bareskrim:server');
+var http = require('http');
+var https = require('https');
 
 /**
  * Get port from environment and store in Express.
  */
 
-const port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
-var options = {
-  // key: fs.readFileSync('/etc/ssl/api-bitode.key'),
-  // cert: fs.readFileSync('/etc/ssl/api-bitode.lpkbitode-so.com.crt'),
-  // ca: fs.readFileSync('/etc/ssl/api-bitode.lpkbitode-so.com_chain.crt')
-};
 
 app.use((req, res, next) => {
   if (req.headers['x-forwarded-proto'] == 'http') {
@@ -37,10 +30,11 @@ app.use((req, res, next) => {
  * Create HTTP server.
  */
 
-const server = http.createServer(app);
+var server = http.createServer(app);
 
 // Create HTTPS server
 https.createServer(options, app).listen(4433);
+
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -50,12 +44,13 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
+
 /**
  * Normalize a port into a number, string, or false.
  */
 
 function normalizePort(val) {
-  const port = parseInt(val, 10);
+  var port = parseInt(val, 10);
 
   if (isNaN(port)) {
     // named pipe
@@ -79,7 +74,7 @@ function onError(error) {
     throw error;
   }
 
-  const bind = typeof port === 'string'
+  var bind = typeof port === 'string'
     ? 'Pipe ' + port
     : 'Port ' + port;
 
@@ -105,6 +100,7 @@ function onError(error) {
 function onListening() {
   createConnection().then(connection => {
     if (connection) {
+      seeder();
       const addr = server.address();
       const bind = typeof addr === 'string'
         ? 'pipe ' + addr
