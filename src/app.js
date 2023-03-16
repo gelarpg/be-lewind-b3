@@ -17,8 +17,10 @@ const config = process.env;
 
 const whitelistDomain = [
   'http://localhost:3000',
+  'http://103.107.100.20',
   'http://103.107.100.59',
-  'https://lewindgroup.com'
+  'https://lewindgroup.com',
+  'http://lewindgroup.com'
 ]
 let corsOptionsDelegate = function (req, callback) {
   let corsOptions;
@@ -44,6 +46,18 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use('/', indexRouter);
 
 // error handler
+// app.use(function (err, req, res, next) {
+//   // render error csrf
+//   if (err.code !== 'EBADCSRFTOKEN') return next(err)
+//   // set locals, only providing error in development
+//   res.locals.message = err.message;
+//   res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+//   // render the error page
+//   res.status(err.status || 500);
+//   res.render('error');
+// });
+
 app.use(function (err, req, res, next) {
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
