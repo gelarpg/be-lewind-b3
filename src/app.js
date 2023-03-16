@@ -58,6 +58,14 @@ app.use('/', indexRouter);
 //   res.render('error');
 // });
 
+app.use((req, res, next) => {
+  if (req.headers['x-forwarded-proto'] == 'http') {
+    return res.redirect(301, 'https://' + req.headers.host + '/');
+  } else {
+    return next();
+  }
+});
+
 app.use(function (err, req, res, next) {
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
