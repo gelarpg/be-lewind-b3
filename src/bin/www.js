@@ -38,7 +38,7 @@ app.use((req, res, next) => {
 var server = http.createServer(app);
 
 // Create HTTPS server
-https.createServer(options, app).listen(4433);
+https.createServer(options, app);
 
 
 /**
