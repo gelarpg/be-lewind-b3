@@ -37,7 +37,8 @@ export const getListSubmissionStatus = async (req, res) => {
                 `ss.id AS id`,
                 `ss.name AS name`,
                 `ss.slug AS slug`
-            ]);
+            ])
+            .where('ss.slug != :slug', { slug: 'pengajuan' });
 
         let report = await query
             .getRawMany();
