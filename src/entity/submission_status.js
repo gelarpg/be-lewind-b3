@@ -16,6 +16,12 @@ const SubmissionStatus = new EntitySchema({
         slug: {
             type: "varchar",
             Index
+        },
+        type: {
+            type: "varchar",
+            default: null,
+            nullable: true,
+            Index
         }
     }
 });

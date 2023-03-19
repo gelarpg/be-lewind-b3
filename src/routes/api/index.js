@@ -8,6 +8,8 @@ import transportationRoute from './transportation';
 import wasteRoute from './waste';
 import clientsRoute from './clients';
 import submissionRoute from './submission';
+import ordersRoute from './orders';
+import billsRoute from './bills';
 import verifyToken from '../../middleware/authenticate';
 import { uploadFile } from '../../controllers/api/attachment';
 import upload from '../../middleware/attachment';
@@ -27,5 +29,7 @@ router.use('/transportation', [verifyToken], transportationRoute);
 router.use('/waste', [verifyToken], wasteRoute);
 router.use('/clients', [verifyToken], clientsRoute);
 router.use('/submission', [verifyToken], submissionRoute);
+router.use('/orders', [verifyToken], ordersRoute);
+router.use('/bills', [verifyToken], billsRoute);
 
 module.exports = router;

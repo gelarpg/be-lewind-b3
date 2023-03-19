@@ -9,6 +9,12 @@ const Submission = new EntitySchema({
             generated: true,
             Index
         },
+        order_id: {
+            type: "varchar",
+            default: null,
+            nullable: true,
+            Index
+        },
         driver_id: {
             type: "integer",
             Index
@@ -30,6 +36,11 @@ const Submission = new EntitySchema({
         status: {
             type: "integer",
             default: null,
+            nullable: true
+        },
+        payment_status: {
+            type: "boolean",
+            default: false,
             nullable: true
         },
         created_at: {

@@ -465,7 +465,73 @@ export const updateSubmission = async (req, res) => {
         const updateSubmission = await queryRunner.manager.save(Submission, dataUpdated);
 
         if (!updateSubmission) {
-            throw new Error('Fail to update data.');
+            throw new Error('Gagal melakukan perubahan.');
+        }
+
+        // COMMIT TRANSACTION
+        await queryRunner.commitTransaction();
+
+        // RESPONSE
+        response = responseSuccess(200, "Success!");
+
+        res.status(response.meta.code).send(response);
+        res.end();
+    } catch (error) {
+        if (statusCode != 500) {
+            response = responseError(statusCode, error);
+        } else {
+            console.log(error);
+            response = responseError(500, 'Terjadi kesalahan pada server.')
+        }
+        // COMMIT TRANSACTION
+        await queryRunner.rollbackTransaction();
+
+        // RESPONSE
+        res.status(response.meta.code).send(response);
+        res.end();
+    }
+
+}
+
+export const approvalSubmission = async (req, res) => {
+    // RESPONSE
+    let response = {}
+    let statusCode = 500;
+
+    // CREATE TYPEORM CONNECTION
+    const connection = getConnection();
+    const queryRunner = connection.createQueryRunner();
+
+    await queryRunner.startTransaction();
+
+    // USERS
+    let {
+        id,
+        role
+    } = req.user;
+
+    try {
+        // Get Existing Data
+        let submission = await queryRunner.manager
+            .findOne(Submission, { id: params.id, deleted_at: null });
+
+        if (!submission) {
+            statusCode = 404;
+            throw new Error('Data tidak ditemukan.');
+        }
+
+        // Create Data
+        let dataUpdated = {
+            ...submission,
+            status: 2,
+            order_id: `PO-${moment.utc().unix()}`,
+            updated_at: moment.utc()
+        }
+
+        const updateSubmissionStatus = await queryRunner.manager.save(Submission, dataUpdated);
+
+        if (!updateSubmissionStatus) {
+            throw new Error('Gagal melakukan perubahan.');
         }
 
         // COMMIT TRANSACTION
