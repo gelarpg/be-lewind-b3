@@ -514,6 +514,9 @@ export const approvalSubmission = async (req, res) => {
     } = req.user;
 
     try {
+        // Request Body
+        let { params } = req;
+
         // Get Existing Data
         let submission = await queryRunner.manager
             .findOne(Submission, { id: params.id, deleted_at: null });

@@ -25,7 +25,8 @@ export const getListOrders = async (req, res) => {
         let {
             limit,
             page,
-            keyword
+            keyword,
+            status
         } = req.query;
 
         limit = limit ? parseInt(limit) : 10;
@@ -52,8 +53,17 @@ export const getListOrders = async (req, res) => {
             .leftJoin(Driver, 'd', 'd.id = s.driver_id')
             .leftJoin(Transportation, 't', 't.id = s.transportation_id')
             .leftJoin(SubmissionStatus, 'ss', 'ss.id = s.status')
-            .where('s.deleted_at IS NULL')
-            .andWhere('s.status != :status', { status: 1 });
+            .where('s.deleted_at IS NULL');
+
+        if (status) {
+            query = query.andWhere('s.status = :status', { status: status })
+        } else {
+            query = query.andWhere('s.status != :status', { status: 1 })
+        }
+
+        if (keyword) {
+            query = query.andWhere('s.order_id ilike :keyword', { keyword: `%${keyword}%` });
+        }
 
         let report = await query
             .skip(from)
@@ -124,12 +134,18 @@ export const getDetailOrder = async (req, res) => {
                 `s.period AS period`,
                 `s.service_fee AS service_fee`,
                 `s.status AS status`,
+                `s.payment_status AS payment_status`,
                 `ss.name AS status_name`,
                 `s.created_at AS created_at`,
                 `s.updated_at AS updated_at`,
+                `c.id AS client_id`,
                 `c.name AS client_name`,
+                `c.address AS client_address`,
+                `d.id AS driver_id`,
                 `d.name AS driver_name`,
+                `t.id AS transportation_id`,
                 `t.name AS transportation_name`,
+                `w.id AS waste_id`,
                 `w.name AS waste_name`
             ])
             .leftJoin(Clients, 'c', 'c.id = s.client_id')
