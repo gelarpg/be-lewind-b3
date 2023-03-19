@@ -35,6 +35,7 @@ export const getListOrders = async (req, res) => {
         let query = connection.createQueryBuilder(Submission, 's')
             .select([
                 `s.id AS id`,
+                `s.order_id AS order_id`,
                 `s.period AS period`,
                 `s.service_fee AS service_fee`,
                 `s.status AS status`,
@@ -51,7 +52,8 @@ export const getListOrders = async (req, res) => {
             .leftJoin(Driver, 'd', 'd.id = s.driver_id')
             .leftJoin(Transportation, 't', 't.id = s.transportation_id')
             .leftJoin(SubmissionStatus, 'ss', 'ss.id = s.status')
-            .where('s.deleted_at IS NULL');
+            .where('s.deleted_at IS NULL')
+            .andWhere('s.status != :status', { status: 1 });
 
         let report = await query
             .skip(from)
@@ -118,6 +120,7 @@ export const getDetailOrder = async (req, res) => {
         let query = connection.createQueryBuilder(Submission, 's')
             .select([
                 `s.id AS id`,
+                `s.order_id AS order_id`,
                 `s.period AS period`,
                 `s.service_fee AS service_fee`,
                 `s.status AS status`,
@@ -135,7 +138,8 @@ export const getDetailOrder = async (req, res) => {
             .leftJoin(Transportation, 't', 't.id = s.transportation_id')
             .leftJoin(SubmissionStatus, 'ss', 'ss.id = s.status')
             .where('s.deleted_at IS NULL')
-            .andWhere('s.id = :id', { id: id });
+            .andWhere('s.id = :id', { id: id })
+            .andWhere('s.status != :status', { status: 1 });
 
         let report = await query
             .getRawOne();

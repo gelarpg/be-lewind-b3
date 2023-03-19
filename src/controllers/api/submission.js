@@ -102,7 +102,8 @@ export const getListSubmission = async (req, res) => {
             .leftJoin(Driver, 'd', 'd.id = s.driver_id')
             .leftJoin(Transportation, 't', 't.id = s.transportation_id')
             .leftJoin(SubmissionStatus, 'ss', 'ss.id = s.status')
-            .where('s.deleted_at IS NULL');
+            .where('s.deleted_at IS NULL')
+            .andWhere('s.status = :status', { status: 1 });
 
         let report = await query
             .skip(from)
@@ -189,7 +190,8 @@ export const getDetailSubmission = async (req, res) => {
             .leftJoin(Driver, 'd', 'd.id = s.driver_id')
             .leftJoin(Transportation, 't', 't.id = s.transportation_id')
             .where('s.deleted_at IS NULL')
-            .andWhere('s.id = :id', { id: id });
+            .andWhere('s.id = :id', { id: id })
+            .andWhere('s.status = :status', { status: 1 });
 
         let report = await query
             .getRawOne();
