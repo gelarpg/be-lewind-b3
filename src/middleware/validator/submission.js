@@ -121,7 +121,14 @@ const updateSubmissionValidation = () => {
     ]
 }
 
+const updateSubmissionStatusValidation = () => {
+    return [
+        check('status', 'Status harus diisi').notEmpty()
+    ]
+}
+
 module.exports = {
     createSubmissionValidation,
-    updateSubmissionValidation
+    updateSubmissionValidation,
+    updateSubmissionStatusValidation
 }

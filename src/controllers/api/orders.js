@@ -1,4 +1,4 @@
-import { getManager } from "typeorm";
+import { getConnection, getManager } from "typeorm";
 import Submission from "../../entity/submission";
 import { responseError, responseSuccess } from "../../utils/response";
 import Transportation from "../../entity/transportation";
@@ -6,6 +6,7 @@ import Waste from "../../entity/waste";
 import Driver from "../../entity/driver";
 import Clients from "../../entity/clients";
 import SubmissionStatus from "../../entity/submission_status";
+import moment from "moment";
 
 export const getListOrders = async (req, res) => {
     // RESPONSE
@@ -179,4 +180,72 @@ export const getDetailOrder = async (req, res) => {
         res.status(response.meta.code).send(response);
         res.end();
     }
+}
+
+export const updateOrderStatus = async (req, res) => {
+    // RESPONSE
+    let response = {}
+    let statusCode = 500;
+
+    // CREATE TYPEORM CONNECTION
+    const connection = getConnection();
+    const queryRunner = connection.createQueryRunner();
+
+    await queryRunner.startTransaction();
+
+    // USERS
+    let {
+        id,
+        role
+    } = req.user;
+
+    try {
+        // Request Body
+        let { params, body } = req;
+
+        // Get Existing Data
+        let submission = await queryRunner.manager
+            .findOne(Submission, { id: params.id, deleted_at: null });
+
+        if (!submission) {
+            statusCode = 404;
+            throw new Error('Data tidak ditemukan.');
+        }
+
+        // Create Data
+        let dataUpdated = {
+            ...submission,
+            status: body.status,
+            updated_at: moment.utc()
+        }
+
+        const updateSubmissionStatus = await queryRunner.manager.save(Submission, dataUpdated);
+
+        if (!updateSubmissionStatus) {
+            throw new Error('Gagal melakukan perubahan.');
+        }
+
+        // COMMIT TRANSACTION
+        await queryRunner.commitTransaction();
+
+        // RESPONSE
+        response = responseSuccess(200, "Success!");
+
+        res.status(response.meta.code).send(response);
+        res.end();
+    } catch (error) {
+        if (statusCode != 500) {
+            response = responseError(statusCode, error);
+        } else {
+            console.log(error);
+            response = responseError(500, 'Terjadi kesalahan pada server.')
+        }
+        // COMMIT TRANSACTION
+        await queryRunner.rollbackTransaction();
+
+        // RESPONSE
+        res.status(response.meta.code).send(response);
+        res.end();
+    }
+
 }
