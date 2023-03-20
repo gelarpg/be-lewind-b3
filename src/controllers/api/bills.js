@@ -7,6 +7,7 @@ import Driver from "../../entity/driver";
 import Clients from "../../entity/clients";
 import SubmissionStatus from "../../entity/submission_status";
 import moment from "moment";
+import SubmissionDocuments from "../../entity/submission_documents";
 
 export const getListBills = async (req, res) => {
     // RESPONSE
@@ -27,7 +28,8 @@ export const getListBills = async (req, res) => {
             limit,
             page,
             keyword,
-            status
+            status,
+            payment_status
         } = req.query;
 
         limit = limit ? parseInt(limit) : 10;
@@ -62,6 +64,10 @@ export const getListBills = async (req, res) => {
             query = query.andWhere('s.status = :status', { status: status })
         } else {
             query = query.andWhere('s.status != :status', { status: 1 })
+        }
+
+        if (payment_status) {
+            query = query.andWhere('s.payment_status = :payment_status', { payment_status: payment_status })
         }
 
         if (keyword) {
@@ -167,6 +173,21 @@ export const getDetailBills = async (req, res) => {
             statusCode = 404;
             throw new Error("Data tidak ditemukan.");
         }
+
+        let documents = await connection.createQueryBuilder(SubmissionDocuments, 'sd')
+            .select([
+                `sd.id AS id`,
+                `sd.type AS type`,
+                `sd.path AS path`,
+                `sd.doc_number AS doc_number`,
+                `sd.created_at AS created_at`,
+                `sd.updated_at AS updated_at`
+            ])
+            .where('sd.deleted_at IS NULL')
+            .andWhere('sd.submission_id = :sid', { sid: report.id })
+            .getRawMany();
+
+        report['documents'] = documents;
 
         response = responseSuccess(200, "Success!", report);
 

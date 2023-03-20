@@ -7,6 +7,7 @@ import Driver from "../../entity/driver";
 import Clients from "../../entity/clients";
 import SubmissionStatus from "../../entity/submission_status";
 import moment from "moment";
+import SubmissionDocuments from "../../entity/submission_documents";
 
 export const getListOrders = async (req, res) => {
     // RESPONSE
@@ -165,6 +166,21 @@ export const getDetailOrder = async (req, res) => {
             statusCode = 404;
             throw new Error("Data tidak ditemukan.");
         }
+
+        let documents = await connection.createQueryBuilder(SubmissionDocuments, 'sd')
+            .select([
+                `sd.id AS id`,
+                `sd.type AS type`,
+                `sd.path AS path`,
+                `sd.doc_number AS doc_number`,
+                `sd.created_at AS created_at`,
+                `sd.updated_at AS updated_at`
+            ])
+            .where('sd.deleted_at IS NULL')
+            .andWhere('sd.submission_id = :sid', { sid: report.id })
+            .getRawMany();
+
+        report['documents'] = documents;
 
         response = responseSuccess(200, "Success!", report);
 
