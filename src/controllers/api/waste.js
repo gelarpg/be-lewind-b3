@@ -4,6 +4,53 @@ import Waste from "../../entity/waste";
 import { responseError, responseSuccess } from "../../utils/response";
 import { validate } from '../../middleware/validator';
 import moment from "moment";
+import WasteType from "../../entity/waste_type";
+
+export const getListWasteType = async (req, res) => {
+    // RESPONSE
+    let response = {}
+    let statusCode = 500;
+
+    // CREATE TYPEORM CONNECTION
+    const connection = getManager();
+
+    // USERS
+    let {
+        role
+    } = req.user;
+
+    try {
+        // Query Params (Pagination)
+        let {
+            keyword
+        } = req.query;
+
+        let query = connection.createQueryBuilder(WasteType, 'wt')
+            .select([
+                `wt.id AS id`,
+                `wt.name AS name`,
+                `wt.slug AS slug`
+            ])
+            .where('wt.deleted_at IS NULL');
+
+        let report = await query
+            .getRawMany();
+
+        response = responseSuccess(200, "Success!", report);
+
+        res.status(response.meta.code).send(response);
+        res.end();
+    } catch (error) {
+        if (statusCode != 500) {
+            response = responseError(statusCode, error);
+        } else {
+            console.log('ERROR: ', error);
+            response = responseError(500, 'Internal server error.')
+        }
+        res.status(response.meta.code).send(response);
+        res.end();
+    }
+}
 
 export const getListWaste = async (req, res) => {
     // RESPONSE
@@ -34,12 +81,14 @@ export const getListWaste = async (req, res) => {
             .select([
                 `w.id AS id`,
                 `w.name AS name`,
-                `w.type AS type`,
                 `w.weight_unit AS weight_unit`,
                 `w.price_unit AS price_unit`,
                 `w.created_at AS created_at`,
+                `w.updated_at AS updated_at`,
+                `wt.name AS waste_type`,
                 `w.updated_at AS updated_at`
             ])
+            .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
             .where('w.deleted_at IS NULL');
 
         let report = await query
@@ -108,12 +157,14 @@ export const getDetailWaste = async (req, res) => {
             .select([
                 `w.id AS id`,
                 `w.name AS name`,
-                `w.type AS type`,
                 `w.weight_unit AS weight_unit`,
                 `w.price_unit AS price_unit`,
                 `w.created_at AS created_at`,
-                `w.updated_at AS updated_at`
+                `w.updated_at AS updated_at`,
+                `wt.id AS waste_type_id`,
+                `wt.name AS waste_type`
             ])
+            .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
             .where('w.deleted_at IS NULL')
             .andWhere('w.id = :id', { id: id });
 
@@ -171,7 +222,7 @@ export const createWaste = async (req, res) => {
         // Create Data
         let data = {
             name: body.name,
-            type: body.type,
+            waste_type_id: body.type,
             weight_unit: body.weight_unit,
             price_unit: body.price_unit,
             created_at: moment.utc(),
@@ -251,7 +302,7 @@ export const updateWaste = async (req, res) => {
         let dataUpdated = {
             ...waste,
             name: body.name,
-            type: body.type,
+            waste_type_id: body.type,
             weight_unit: body.weight_unit,
             price_unit: body.price_unit,
             updated_at: moment.utc()

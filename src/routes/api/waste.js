@@ -1,10 +1,11 @@
 import express from 'express';
 import { waste } from '../../middleware/validator';
 import { isSuper } from '../../middleware/guards';
-import { createWaste, deleteWaste, getDetailWaste, getListWaste, updateWaste } from '../../controllers/api/waste';
+import { createWaste, deleteWaste, getDetailWaste, getListWaste, getListWasteType, updateWaste } from '../../controllers/api/waste';
 
 const router = express.Router();
 
+router.get('/list/type', getListWasteType);
 router.get('/', getListWaste);
 router.get('/detail/:id', getDetailWaste);
 router.post('/create', waste.createWasteValidation(), createWaste);

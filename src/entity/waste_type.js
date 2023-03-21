@@ -1,7 +1,7 @@
 const { EntitySchema, Index } = require('typeorm');
 
-const Waste = new EntitySchema({
-    name: "Waste",
+const WasteType = new EntitySchema({
+    name: "WasteType",
     columns: {
         id: {
             primary: true,
@@ -9,21 +9,12 @@ const Waste = new EntitySchema({
             generated: true,
             Index
         },
-        waste_type_id: {
-            type: "integer",
-            nullable: true,
-            default: null,
-            Index
-        },
         name: {
             type: "varchar",
             Index
         },
-        weight_unit: {
+        slug: {
             type: "varchar"
-        },
-        price_unit: {
-            type: "double precision"
         },
         created_at: {
             type: "timestamp",
@@ -43,4 +34,4 @@ const Waste = new EntitySchema({
     }
 });
 
-module.exports = Waste;
+module.exports = WasteType;

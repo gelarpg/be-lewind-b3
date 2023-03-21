@@ -4,6 +4,7 @@ import Roles from '../entity/roles';
 import Users from '../entity/users';
 import SubmissionStatus from "../entity/submission_status";
 import TransportationType from "../entity/transportation_type";
+import WasteType from "../entity/waste_type";
 
 const seeder = async (req, res) => {
     try {
@@ -11,11 +12,13 @@ const seeder = async (req, res) => {
         const userRepository = getRepository(Users);
         const submissionStatusRepository = getRepository(SubmissionStatus);
         const transportationTypeRepository = getRepository(TransportationType);
+        const wasteTypeRepository = getRepository(WasteType);
 
         const allRoles = await roleRepository.find();
         const allUsers = await userRepository.find();
         const allSubmissionStatus = await submissionStatusRepository.find();
         const allTransportationType = await transportationTypeRepository.find();
+        const allWasteType = await wasteTypeRepository.find();
 
         if (allRoles.length <= 0 && allUsers.length <= 0) {
             let role1 = {
@@ -134,6 +137,10 @@ const seeder = async (req, res) => {
                     slug: 'waiting_pickup'
                 },
                 {
+                    name: 'Pickup',
+                    slug: 'pickup'
+                },
+                {
                     name: 'Selesai',
                     slug: 'selesai'
                 },
@@ -161,6 +168,51 @@ const seeder = async (req, res) => {
             await transportationTypeRepository.save(transportation_type);
 
             console.log("SUCCESS CREATED DATA SUBMISSION STATUS");
+        }
+
+        if (allWasteType.length <= 0) {
+            let waste_type = [
+                {
+                    name: 'Limbah Cair',
+                    slug: 'limbah_cair',
+                    created_at: new Date(),
+                    updated_at: new Date()
+                },
+                {
+                    name: 'Limbah Padat',
+                    slug: 'limbah_padat',
+                    created_at: new Date(),
+                    updated_at: new Date()
+                },
+                {
+                    name: 'Limbah Organik',
+                    slug: 'limbah_organik',
+                    created_at: new Date(),
+                    updated_at: new Date()
+                },
+                {
+                    name: 'Limbah Daur Ulang',
+                    slug: 'limbah_daur_ulang',
+                    created_at: new Date(),
+                    updated_at: new Date()
+                },
+                {
+                    name: 'Limbah Berbahaya',
+                    slug: 'limbah_berbahaya',
+                    created_at: new Date(),
+                    updated_at: new Date()
+                },
+                {
+                    name: 'Lainnya',
+                    slug: 'lainnya',
+                    created_at: new Date(),
+                    updated_at: new Date()
+                }
+            ];
+
+            await wasteTypeRepository.save(waste_type);
+
+            console.log("SUCCESS CREATED DATA WASTE TYPE");
         }
 
     } catch (error) {
