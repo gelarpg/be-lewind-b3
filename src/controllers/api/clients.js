@@ -5,6 +5,7 @@ import { responseError, responseSuccess } from "../../utils/response";
 import { validate } from '../../middleware/validator';
 import moment from "moment";
 import Waste from "../../entity/waste";
+import WasteType from "../../entity/waste_type";
 
 export const getListClients = async (req, res) => {
     // RESPONSE
@@ -41,9 +42,10 @@ export const getListClients = async (req, res) => {
                 `c.created_at AS created_at`,
                 `c.updated_at AS updated_at`,
                 `w.name AS waste_name`,
-                `w.type AS waste_type`,
+                `wt.name AS waste_type`,
             ])
             .leftJoin(Waste, 'w', 'w.id = c.waste_id')
+            .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
             .where('c.deleted_at IS NULL');
 
         let report = await query
@@ -119,11 +121,13 @@ export const getDetailClients = async (req, res) => {
                 `c.updated_at AS updated_at`,
                 `w.id AS waste_id`,
                 `w.name AS waste_name`,
-                `w.type AS waste_type`,
+                `wt.id AS waste_type_id`,
+                `wt.name AS waste_type`,
                 `w.weight_unit AS waste_weight_unit`,
                 `w.price_unit AS waste_price_unit`
             ])
             .leftJoin(Waste, 'w', 'w.id = c.waste_id')
+            .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
             .where('w.deleted_at IS NULL')
             .andWhere('w.id = :id', { id: id });
 

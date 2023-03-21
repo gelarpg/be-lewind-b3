@@ -85,7 +85,7 @@ export const getListWaste = async (req, res) => {
                 `w.price_unit AS price_unit`,
                 `w.created_at AS created_at`,
                 `w.updated_at AS updated_at`,
-                `wt.name AS waste_type`,
+                `wt.name AS type`,
                 `w.updated_at AS updated_at`
             ])
             .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
@@ -162,7 +162,7 @@ export const getDetailWaste = async (req, res) => {
                 `w.created_at AS created_at`,
                 `w.updated_at AS updated_at`,
                 `wt.id AS waste_type_id`,
-                `wt.name AS waste_type`
+                `wt.name AS type`
             ])
             .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
             .where('w.deleted_at IS NULL')

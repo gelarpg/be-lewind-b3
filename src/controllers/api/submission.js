@@ -12,6 +12,7 @@ import SubmissionStatus from "../../entity/submission_status";
 import SubmissionDocuments from "../../entity/submission_documents";
 import { checkAndCreateDirectory } from "../../middleware/helper";
 import fs from 'fs';
+import WasteType from "../../entity/waste_type";
 
 export const getListSubmissionStatus = async (req, res) => {
     // RESPONSE
@@ -96,10 +97,12 @@ export const getListSubmission = async (req, res) => {
                 `c.name AS client_name`,
                 `d.name AS driver_name`,
                 `t.name AS transportation_name`,
-                `w.name AS waste_name`
+                `w.name AS waste_name`,
+                `wt.name AS waste_type`,
             ])
             .leftJoin(Clients, 'c', 'c.id = s.client_id')
             .leftJoin(Waste, 'w', 'w.id = c.waste_id')
+            .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
             .leftJoin(Driver, 'd', 'd.id = s.driver_id')
             .leftJoin(Transportation, 't', 't.id = s.transportation_id')
             .leftJoin(SubmissionStatus, 'ss', 'ss.id = s.status')
@@ -184,10 +187,13 @@ export const getDetailSubmission = async (req, res) => {
                 `t.id AS transportation_id`,
                 `t.name AS transportation_name`,
                 `w.id AS waste_id`,
-                `w.name AS waste_name`
+                `w.name AS waste_name`,
+                `wt.id AS waste_type_id`,
+                `wt.name AS waste_type`,
             ])
             .leftJoin(Clients, 'c', 'c.id = s.client_id')
             .leftJoin(Waste, 'w', 'w.id = c.waste_id')
+            .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
             .leftJoin(Driver, 'd', 'd.id = s.driver_id')
             .leftJoin(Transportation, 't', 't.id = s.transportation_id')
             .where('s.deleted_at IS NULL')
