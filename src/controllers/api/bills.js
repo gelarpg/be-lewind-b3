@@ -30,7 +30,8 @@ export const getListBills = async (req, res) => {
             page,
             keyword,
             status,
-            payment_status
+            payment_status,
+            date
         } = req.query;
 
         limit = limit ? parseInt(limit) : 10;
@@ -75,6 +76,10 @@ export const getListBills = async (req, res) => {
 
         if (keyword) {
             query = query.andWhere('s.order_id ilike :keyword', { keyword: `%${keyword}%` });
+        }
+
+        if (date) {
+            query = query.andWhere(`TO_CHAR(s.created_at, 'YYYY-MM-DD') = '${moment(date).format('YYYY-MM-DD')}'`)
         }
 
         let report = await query

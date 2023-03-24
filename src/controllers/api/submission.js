@@ -79,7 +79,8 @@ export const getListSubmission = async (req, res) => {
         let {
             limit,
             page,
-            keyword
+            keyword,
+            date
         } = req.query;
 
         limit = limit ? parseInt(limit) : 10;
@@ -109,6 +110,10 @@ export const getListSubmission = async (req, res) => {
             .leftJoin(SubmissionStatus, 'ss', 'ss.id = s.status')
             .where('s.deleted_at IS NULL')
             .andWhere('s.status = :status', { status: 1 });
+
+        if (date) {
+            query = query.andWhere(`TO_CHAR(s.created_at, 'YYYY-MM-DD') = '${moment(date).format('YYYY-MM-DD')}'`)
+        }
 
         let report = await query
             .skip(from)

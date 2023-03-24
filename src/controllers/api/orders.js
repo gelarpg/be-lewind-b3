@@ -30,7 +30,8 @@ export const getListOrders = async (req, res) => {
             limit,
             page,
             keyword,
-            status
+            status,
+            date
         } = req.query;
 
         limit = limit ? parseInt(limit) : 10;
@@ -69,6 +70,10 @@ export const getListOrders = async (req, res) => {
 
         if (keyword) {
             query = query.andWhere('s.order_id ilike :keyword', { keyword: `%${keyword}%` });
+        }
+
+        if (date) {
+            query = query.andWhere(`TO_CHAR(s.created_at, 'YYYY-MM-DD') = '${moment(date).format('YYYY-MM-DD')}'`)
         }
 
         let report = await query

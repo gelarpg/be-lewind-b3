@@ -23,6 +23,15 @@ export const getDashbaords = async (req, res) => {
 
     try {
 
+        // Query Params (Pagination)
+        let {
+            start_date,
+            end_date
+        } = req.query;
+
+        start_date = start_date ? moment(start_date).format('YYYY-MM-DD 00:00:00') : moment().subtract(14, 'day').format('YYYY-MM-DD 00:00:00');
+        end_date = end_date ? moment(end_date).format('YYYY-MM-DD 23:59:59') : moment().format('YYYY-MM-DD 23:59:59');
+
         /**
          * DASHBOARD ORDER PAYMENT STATUS
          */
@@ -35,6 +44,12 @@ export const getDashbaords = async (req, res) => {
                 id: [2, 3, 4, 5]
             })
             .andWhere('s.deleted_at IS NULL')
+            .andWhere(`s.created_at >= :start_date`, {
+                start_date: start_date
+            })
+            .andWhere(`s.created_at <= :end_date`, {
+                end_date: end_date
+            })
             .groupBy('s.payment_status')
             .getRawMany();
 
@@ -71,6 +86,12 @@ export const getDashbaords = async (req, res) => {
                 id: [1, 5]
             })
             .andWhere('s.deleted_at IS NULL')
+            .andWhere(`s.created_at >= :start_date`, {
+                start_date: start_date
+            })
+            .andWhere(`s.created_at <= :end_date`, {
+                end_date: end_date
+            })
             .groupBy('s.status')
             .getRawMany();
 
@@ -105,6 +126,12 @@ export const getDashbaords = async (req, res) => {
                 'do.total as total'
             ])
             .where('do.status = 1')
+            .andWhere(`do.date >= :start_date`, {
+                start_date: moment(start_date).format('YYYY-MM-DD')
+            })
+            .andWhere(`do.date <= :end_date`, {
+                end_date: moment(end_date).format('YYYY-MM-DD')
+            })
             .getRawMany();
 
         /**
@@ -117,6 +144,12 @@ export const getDashbaords = async (req, res) => {
                 'do.total as total'
             ])
             .where('do.status = 2')
+            .andWhere(`do.date >= :start_date`, {
+                start_date: moment(start_date).format('YYYY-MM-DD')
+            })
+            .andWhere(`do.date <= :end_date`, {
+                end_date: moment(end_date).format('YYYY-MM-DD')
+            })
             .getRawMany();
 
         /**
@@ -129,6 +162,12 @@ export const getDashbaords = async (req, res) => {
                 'do.total as total'
             ])
             .where('do.status = 5')
+            .andWhere(`do.date >= :start_date`, {
+                start_date: moment(start_date).format('YYYY-MM-DD')
+            })
+            .andWhere(`do.date <= :end_date`, {
+                end_date: moment(end_date).format('YYYY-MM-DD')
+            })
             .getRawMany();
 
         /**
@@ -138,7 +177,19 @@ export const getDashbaords = async (req, res) => {
             .select([
                 'wt.id as id',
                 'wt.name as name',
-                `(SELECT COUNT(w.id) from waste w where w.waste_type_id = wt.id and w.deleted_at is null)::int as total`
+                `(
+                    SELECT COUNT(w.id) 
+                    FROM submission s 
+                    LEFT JOIN clients c
+                        ON s.client_id = c.id
+                    LEFT JOIN waste w
+                        ON c.waste_id = w.id
+                    LEFT JOIN waste_type wt2
+                        ON wt2.id = w.waste_type_id
+                    WHERE wt2.id = wt.id 
+                        AND s.deleted_at IS NULL
+                        AND s.created_at >= '${start_date}'
+                        AND s.created_at <= '${end_date}')::int as total`
             ])
             .getRawMany();
 
