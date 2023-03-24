@@ -13,6 +13,7 @@ import SubmissionDocuments from "../../entity/submission_documents";
 import { checkAndCreateDirectory } from "../../middleware/helper";
 import fs from 'fs';
 import WasteType from "../../entity/waste_type";
+import { calculateDashboardInput } from "./dashboard";
 
 export const getListSubmissionStatus = async (req, res) => {
     // RESPONSE
@@ -294,108 +295,130 @@ export const createSubmission = async (req, res) => {
         checkAndCreateDirectory(directory);
 
         // Service Fee Document
-        let service_fee_file = body.service_fee_file;
-        let service_fee_file_name = service_fee_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        fs.renameSync('./tmp/' + service_fee_file, directory + '/' + service_fee_file_name);
+        if (body.service_fee_file) {
+            let service_fee_file = body.service_fee_file;
+            let service_fee_file_name = service_fee_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            fs.renameSync('./tmp/' + service_fee_file, directory + '/' + service_fee_file_name);
 
-        submission_documents.push({
-            submission_id: storeSubmission.id,
-            type: 'service_fee',
-            doc_number: '-',
-            path: directoryResult + '/' + service_fee_file_name,
-            created_at: moment(),
-            updated_at: moment()
-        });
+            submission_documents.push({
+                submission_id: storeSubmission.id,
+                type: 'service_fee',
+                doc_number: '-',
+                path: directoryResult + '/' + service_fee_file_name,
+                created_at: moment(),
+                updated_at: moment()
+            });
+        }
 
         // Invoice
-        let invoice_file = body.invoice_file;
-        let invoice_file_name = invoice_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        fs.renameSync('./tmp/' + invoice_file, directory + '/' + invoice_file_name);
+        if (body.invoice_file) {
+            let invoice_file = body.invoice_file;
+            let invoice_file_name = invoice_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            fs.renameSync('./tmp/' + invoice_file, directory + '/' + invoice_file_name);
 
-        submission_documents.push({
-            submission_id: storeSubmission.id,
-            type: 'invoice',
-            doc_number: '-',
-            path: directoryResult + '/' + invoice_file_name,
-            created_at: moment(),
-            updated_at: moment()
-        });
+            submission_documents.push({
+                submission_id: storeSubmission.id,
+                type: 'invoice',
+                doc_number: '-',
+                path: directoryResult + '/' + invoice_file_name,
+                created_at: moment(),
+                updated_at: moment()
+            });
+        }
 
         // Provider
-        let provider_file = body.provider_file;
-        let provider_file_name = provider_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        fs.renameSync('./tmp/' + provider_file, directory + '/' + provider_file_name);
+        if (body.provider_file) {
+            let provider_file = body.provider_file;
+            let provider_file_name = provider_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            fs.renameSync('./tmp/' + provider_file, directory + '/' + provider_file_name);
 
-        submission_documents.push({
-            submission_id: storeSubmission.id,
-            type: 'provider',
-            doc_number: '-',
-            path: directoryResult + '/' + provider_file_name,
-            created_at: moment(),
-            updated_at: moment()
-        });
+            submission_documents.push({
+                submission_id: storeSubmission.id,
+                type: 'provider',
+                doc_number: '-',
+                path: directoryResult + '/' + provider_file_name,
+                created_at: moment(),
+                updated_at: moment()
+            });
+        }
 
         // Transporter
-        let transporter_file = body.transporter_file;
-        let transporter_file_name = transporter_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        fs.renameSync('./tmp/' + transporter_file, directory + '/' + transporter_file_name);
+        if (body.transporter_file) {
+            let transporter_file = body.transporter_file;
+            let transporter_file_name = transporter_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            fs.renameSync('./tmp/' + transporter_file, directory + '/' + transporter_file_name);
 
-        submission_documents.push({
-            submission_id: storeSubmission.id,
-            type: 'transporter',
-            doc_number: '-',
-            path: directoryResult + '/' + transporter_file_name,
-            created_at: moment(),
-            updated_at: moment()
-        });
+            submission_documents.push({
+                submission_id: storeSubmission.id,
+                type: 'transporter',
+                doc_number: '-',
+                path: directoryResult + '/' + transporter_file_name,
+                created_at: moment(),
+                updated_at: moment()
+            });
+        }
 
         // Waste Receipt
-        let waste_receipt_file = body.waste_receipt_file;
-        let waste_receipt_file_name = waste_receipt_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        fs.renameSync('./tmp/' + waste_receipt_file, directory + '/' + waste_receipt_file_name);
+        if (body.waste_receipt_file) {
+            let waste_receipt_file = body.waste_receipt_file;
+            let waste_receipt_file_name = waste_receipt_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            fs.renameSync('./tmp/' + waste_receipt_file, directory + '/' + waste_receipt_file_name);
 
-        submission_documents.push({
-            submission_id: storeSubmission.id,
-            type: 'waste_receipt',
-            doc_number: '-',
-            path: directoryResult + '/' + waste_receipt_file_name,
-            created_at: moment(),
-            updated_at: moment()
-        });
+            submission_documents.push({
+                submission_id: storeSubmission.id,
+                type: 'waste_receipt',
+                doc_number: '-',
+                path: directoryResult + '/' + waste_receipt_file_name,
+                created_at: moment(),
+                updated_at: moment()
+            });
+        }
 
         // BAST
-        let bast_file = body.bast_file;
-        let bast_file_name = bast_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        fs.renameSync('./tmp/' + bast_file, directory + '/' + bast_file_name);
+        if (body.bast_file) {
+            let bast_file = body.bast_file;
+            let bast_file_name = bast_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            fs.renameSync('./tmp/' + bast_file, directory + '/' + bast_file_name);
 
-        submission_documents.push({
-            submission_id: storeSubmission.id,
-            type: 'bast',
-            doc_number: '-',
-            path: directoryResult + '/' + bast_file_name,
-            created_at: moment(),
-            updated_at: moment()
-        });
+            submission_documents.push({
+                submission_id: storeSubmission.id,
+                type: 'bast',
+                doc_number: '-',
+                path: directoryResult + '/' + bast_file_name,
+                created_at: moment(),
+                updated_at: moment()
+            });
+        }
 
         // Travel Document
-        let travel_document_file = body.travel_document_file;
-        let travel_document_file_name = travel_document_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        fs.renameSync('./tmp/' + travel_document_file, directory + '/' + travel_document_file_name);
+        if (body.travel_document_file) {
+            let travel_document_file = body.travel_document_file;
+            let travel_document_file_name = travel_document_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            fs.renameSync('./tmp/' + travel_document_file, directory + '/' + travel_document_file_name);
 
-        submission_documents.push({
-            submission_id: storeSubmission.id,
-            type: 'travel_document',
-            doc_number: '-',
-            path: directoryResult + '/' + travel_document_file_name,
-            created_at: moment(),
-            updated_at: moment()
-        });
+            submission_documents.push({
+                submission_id: storeSubmission.id,
+                type: 'travel_document',
+                doc_number: '-',
+                path: directoryResult + '/' + travel_document_file_name,
+                created_at: moment(),
+                updated_at: moment()
+            });
+        }
 
-        let storeSubmissionDocuments = await queryRunner.manager
-            .getRepository(SubmissionDocuments)
-            .save(submission_documents);
+        if (submission_documents.length > 0) {
+            let storeSubmissionDocuments = await queryRunner.manager
+                .getRepository(SubmissionDocuments)
+                .save(submission_documents);
 
-        if (!storeSubmissionDocuments) {
+            if (!storeSubmissionDocuments) {
+                throw new Error('Fail to create data.');
+            }
+        }
+
+        let calculateDashboard = await calculateDashboardInput(queryRunner, storeSubmission, 'create');
+
+        if (!calculateDashboard) {
             throw new Error('Fail to create data.');
         }
 
@@ -546,6 +569,12 @@ export const approvalSubmission = async (req, res) => {
             throw new Error('Gagal melakukan perubahan.');
         }
 
+        let calculateDashboard = await calculateDashboardInput(queryRunner, updateSubmissionStatus, 'create');
+
+        if (!calculateDashboard) {
+            throw new Error('Gagal melakukan perubahan.');
+        }
+
         // COMMIT TRANSACTION
         await queryRunner.commitTransaction();
 
@@ -577,7 +606,10 @@ export const deleteSubmission = async (req, res) => {
     let statusCode = 500;
 
     // CREATE TYPEORM CONNECTION
-    const connection = getManager();
+    const connection = getConnection();
+    const queryRunner = connection.createQueryRunner();
+
+    await queryRunner.startTransaction();
 
     // USERS
     let {
@@ -589,19 +621,35 @@ export const deleteSubmission = async (req, res) => {
         // Request Body
         let { params } = req;
 
-        // Create Data
-        let query = await connection.update(Submission, { id: params.id, deleted_at: null }, {
-            deleted_at: moment()
-        });
+        // Get Existing Data
+        let submission = await queryRunner.manager
+            .findOne(Submission, { id: params.id, deleted_at: null });
 
-        if (!query) {
-            throw new Error('Gagal menghapus data.');
-        }
-
-        if (query.affected === 0) {
+        if (!submission) {
             statusCode = 404;
             throw new Error('Data tidak ditemukan.');
         }
+
+        // Create Data
+        let dataUpdated = {
+            ...submission,
+            deleted_at: moment.utc()
+        }
+
+        const updateSubmissionStatus = await queryRunner.manager.save(Submission, dataUpdated);
+
+        if (!updateSubmissionStatus) {
+            throw new Error('Gagal menghapus data.');
+        }
+
+        let calculateDashboard = await calculateDashboardInput(queryRunner, updateSubmissionStatus, 'delete');
+
+        if (!calculateDashboard) {
+            throw new Error('Gagal menghapus data.');
+        }
+
+        // COMMIT TRANSACTION
+        await queryRunner.commitTransaction();
 
         response = responseSuccess(200, "Success!");
 
@@ -614,6 +662,10 @@ export const deleteSubmission = async (req, res) => {
             console.log(error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+
+        // COMMIT TRANSACTION
+        await queryRunner.rollbackTransaction();
+
         res.status(response.meta.code).send(response);
         res.end();
     }

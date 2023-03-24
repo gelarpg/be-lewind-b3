@@ -9,7 +9,7 @@ const csrf = require('csurf');
 const session = require('express-session');
 const cors = require('cors');
 // CRON
-// const scheduleFunction = require('./cron');
+const scheduleFunction = require('./cron');
 const indexRouter = require('./routes/index');
 
 var app = express();
@@ -33,7 +33,7 @@ let corsOptionsDelegate = function (req, callback) {
 }
 
 // Init schedule
-// scheduleFunction.initScheduledJobs();
+scheduleFunction.initScheduledJobs();
 app.use(cors(corsOptionsDelegate));
 
 app.use(logger('dev'));

@@ -9,6 +9,7 @@ import SubmissionStatus from "../../entity/submission_status";
 import moment from "moment";
 import SubmissionDocuments from "../../entity/submission_documents";
 import WasteType from "../../entity/waste_type";
+import { calculateDashboardInput } from "./dashboard";
 
 export const getListOrders = async (req, res) => {
     // RESPONSE
@@ -244,6 +245,12 @@ export const updateOrderStatus = async (req, res) => {
         const updateSubmissionStatus = await queryRunner.manager.save(Submission, dataUpdated);
 
         if (!updateSubmissionStatus) {
+            throw new Error('Gagal melakukan perubahan.');
+        }
+
+        let calculateDashboard = await calculateDashboardInput(queryRunner, updateSubmissionStatus, 'create');
+
+        if (!calculateDashboard) {
             throw new Error('Gagal melakukan perubahan.');
         }
 

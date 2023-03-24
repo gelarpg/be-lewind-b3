@@ -10,6 +10,7 @@ import clientsRoute from './clients';
 import submissionRoute from './submission';
 import ordersRoute from './orders';
 import billsRoute from './bills';
+import dashboardRoute from './dashboard';
 import verifyToken from '../../middleware/authenticate';
 import { uploadFile } from '../../controllers/api/attachment';
 import upload from '../../middleware/attachment';
@@ -23,6 +24,7 @@ router.use('/auth', [verifyToken], authRoute);
 router.post('/upload-attachment', verifyToken, upload.array('files'), uploadFile);
 
 /* Router */
+router.use('/dashboard', [verifyToken], dashboardRoute);
 router.use('/users', [verifyToken], userRoute);
 router.use('/driver', [verifyToken], driverRoute);
 router.use('/transportation', [verifyToken], transportationRoute);
