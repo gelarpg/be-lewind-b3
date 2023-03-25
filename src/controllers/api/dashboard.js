@@ -83,7 +83,7 @@ export const getDashbaords = async (req, res) => {
                 'COUNT(s.status)::int as total'
             ])
             .where('s.status IN (:...id)', {
-                id: [1, 5]
+                id: [6, 5]
             })
             .andWhere('s.deleted_at IS NULL')
             .andWhere(`s.created_at >= :start_date`, {
