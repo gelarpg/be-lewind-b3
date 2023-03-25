@@ -128,8 +128,8 @@ export const getDetailClients = async (req, res) => {
             ])
             .leftJoin(Waste, 'w', 'w.id = c.waste_id')
             .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
-            .where('w.deleted_at IS NULL')
-            .andWhere('w.id = :id', { id: id });
+            .where('c.deleted_at IS NULL')
+            .andWhere('c.id = :id', { id: id });
 
         let report = await query
             .getRawOne();
