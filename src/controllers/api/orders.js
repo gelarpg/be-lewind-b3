@@ -255,7 +255,7 @@ export const updateOrderStatus = async (req, res) => {
             throw new Error('Gagal melakukan perubahan.');
         }
 
-        let calculateDashboard = await calculateDashboardInput(queryRunner, updateSubmissionStatus, 'create');
+        let calculateDashboard = await calculateDashboardInput(queryRunner, submission, 'create');
 
         if (!calculateDashboard) {
             throw new Error('Gagal melakukan perubahan.');
