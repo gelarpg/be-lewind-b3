@@ -429,6 +429,7 @@ export const createSubmission = async (req, res) => {
 
         // COMMIT TRANSACTION
         await queryRunner.commitTransaction();
+        await queryRunner.release();
 
         // RESPONSE
         response = responseSuccess(200, "Success!");
@@ -444,6 +445,7 @@ export const createSubmission = async (req, res) => {
         }
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
+        await queryRunner.release();
 
         // RESPONSE
         res.status(response.meta.code).send(response);
@@ -698,6 +700,7 @@ export const updateSubmission = async (req, res) => {
 
         // COMMIT TRANSACTION
         await queryRunner.commitTransaction();
+        await queryRunner.release();
 
         // RESPONSE
         response = responseSuccess(200, "Success!");
@@ -713,6 +716,7 @@ export const updateSubmission = async (req, res) => {
         }
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
+        await queryRunner.release();
 
         // RESPONSE
         res.status(response.meta.code).send(response);
@@ -773,6 +777,7 @@ export const approvalSubmission = async (req, res) => {
 
         // COMMIT TRANSACTION
         await queryRunner.commitTransaction();
+        await queryRunner.release();
 
         // RESPONSE
         response = responseSuccess(200, "Success!");
@@ -788,6 +793,7 @@ export const approvalSubmission = async (req, res) => {
         }
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
+        await queryRunner.release();
 
         // RESPONSE
         res.status(response.meta.code).send(response);
@@ -846,6 +852,7 @@ export const deleteSubmission = async (req, res) => {
 
         // COMMIT TRANSACTION
         await queryRunner.commitTransaction();
+        await queryRunner.release();
 
         response = responseSuccess(200, "Success!");
 
@@ -861,6 +868,7 @@ export const deleteSubmission = async (req, res) => {
 
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
+        await queryRunner.release();
 
         res.status(response.meta.code).send(response);
         res.end();

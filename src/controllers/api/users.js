@@ -201,6 +201,7 @@ export const createUsers = async (req, res) => {
 
         // COMMIT TRANSACTION
         await queryRunner.commitTransaction();
+        await queryRunner.release();
 
         // RESPONSE
         response = responseSuccess(200, "Success!");
@@ -216,6 +217,7 @@ export const createUsers = async (req, res) => {
         }
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
+        await queryRunner.release();
 
         // RESPONSE
         res.status(response.meta.code).send(response);
@@ -280,6 +282,7 @@ export const updateUsers = async (req, res) => {
 
         // COMMIT TRANSACTION
         await queryRunner.commitTransaction();
+        await queryRunner.release();
 
         // RESPONSE
         response = responseSuccess(200, "Success!");
@@ -295,6 +298,7 @@ export const updateUsers = async (req, res) => {
         }
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
+        await queryRunner.release();
 
         // RESPONSE
         res.status(response.meta.code).send(response);
@@ -401,6 +405,7 @@ export const updateUsersPassword = async (req, res) => {
 
         // COMMIT TRANSACTION
         await queryRunner.commitTransaction();
+        await queryRunner.release();
 
         // RESPONSE
         response = responseSuccess(200, "Success!");
@@ -416,6 +421,7 @@ export const updateUsersPassword = async (req, res) => {
         }
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
+        await queryRunner.release();
 
         // RESPONSE
         res.status(response.meta.code).send(response);

@@ -308,6 +308,7 @@ export const createTransportation = async (req, res) => {
 
         // COMMIT TRANSACTION
         await queryRunner.commitTransaction();
+        await queryRunner.release();
 
         // RESPONSE
         response = responseSuccess(200, "Success!");
@@ -323,6 +324,7 @@ export const createTransportation = async (req, res) => {
         }
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
+        await queryRunner.release();
 
         // RESPONSE
         res.status(response.meta.code).send(response);
@@ -430,6 +432,7 @@ export const updateTransportation = async (req, res) => {
 
         // COMMIT TRANSACTION
         await queryRunner.commitTransaction();
+        await queryRunner.release();
 
         // RESPONSE
         response = responseSuccess(200, "Success!");
@@ -445,6 +448,7 @@ export const updateTransportation = async (req, res) => {
         }
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
+        await queryRunner.release();
 
         // RESPONSE
         res.status(response.meta.code).send(response);
