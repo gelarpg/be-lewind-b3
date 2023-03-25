@@ -61,14 +61,8 @@ export const getListBills = async (req, res) => {
             .leftJoin(Driver, 'd', 'd.id = s.driver_id')
             .leftJoin(Transportation, 't', 't.id = s.transportation_id')
             .leftJoin(SubmissionStatus, 'ss', 'ss.id = s.status')
-            .where('s.deleted_at IS NULL');
-
-
-        if (status) {
-            query = query.andWhere('s.status = :status', { status: status })
-        } else {
-            query = query.andWhere('s.status != :status', { status: 1 })
-        }
+            .where('s.deleted_at IS NULL')
+            .andWhere('s.status = :status', { status: 5 });
 
         if (payment_status) {
             query = query.andWhere('s.payment_status = :payment_status', { payment_status: payment_status })
