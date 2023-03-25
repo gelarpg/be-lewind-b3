@@ -10,6 +10,8 @@ import moment from "moment";
 import SubmissionDocuments from "../../entity/submission_documents";
 import WasteType from "../../entity/waste_type";
 import { calculateDashboardInput } from "./dashboard";
+import { checkAndCreateDirectory } from "../../middleware/helper";
+import fs from 'fs';
 
 export const getListOrders = async (req, res) => {
     // RESPONSE
@@ -257,6 +259,252 @@ export const updateOrderStatus = async (req, res) => {
 
         if (!calculateDashboard) {
             throw new Error('Gagal melakukan perubahan.');
+        }
+
+        // COMMIT TRANSACTION
+        await queryRunner.commitTransaction();
+
+        // RESPONSE
+        response = responseSuccess(200, "Success!");
+
+        res.status(response.meta.code).send(response);
+        res.end();
+    } catch (error) {
+        if (statusCode != 500) {
+            response = responseError(statusCode, error);
+        } else {
+            console.log(error);
+            response = responseError(500, 'Terjadi kesalahan pada server.')
+        }
+        // COMMIT TRANSACTION
+        await queryRunner.rollbackTransaction();
+
+        // RESPONSE
+        res.status(response.meta.code).send(response);
+        res.end();
+    }
+
+}
+
+export const updateOrders = async (req, res) => {
+    // RESPONSE
+    let response = {}
+    let statusCode = 500;
+
+    // CREATE TYPEORM CONNECTION
+    const connection = getConnection();
+    const queryRunner = connection.createQueryRunner();
+
+    await queryRunner.startTransaction();
+
+    // USERS
+    let {
+        id,
+        role
+    } = req.user;
+
+    try {
+        // Request Body
+        let { body, params } = req;
+
+        // Get Existing Data
+        let order = await queryRunner.manager
+            .findOne(Submission, { id: params.id, deleted_at: null });
+
+        if (!order) {
+            statusCode = 404;
+            throw new Error('Data tidak ditemukan.');
+        }
+
+        // MAPPING DRIVER DOCUMENT
+        let updated_docs = [];
+        let order_documents = [];
+        let directory = `public/api/upload/attachments/submission/${order.id}`;
+        let directoryResult = `/api/upload/attachments/submission/${order.id}`;
+
+        checkAndCreateDirectory(directory);
+
+        // Service Fee Document
+        if (body.service_fee_file) {
+            if (fs.existsSync('./tmp/' + body.service_fee_file)) {
+                let service_fee_file = body.service_fee_file;
+                let service_fee_file_name = service_fee_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                fs.renameSync('./tmp/' + service_fee_file, directory + '/' + service_fee_file_name);
+
+                order_documents.push({
+                    submission_id: order.id,
+                    type: 'service_fee',
+                    doc_number: '-',
+                    path: directoryResult + '/' + service_fee_file_name,
+                    created_at: moment(),
+                    updated_at: moment()
+                });
+
+                updated_docs.push('service_fee');
+            } else {
+                statusCode = 400;
+                throw new Error(`File dengan nama ${body.service_fee_file} tidak tersedia.`);
+            }
+        }
+
+        // Invoice
+        if (body.invoice_file) {
+            if (fs.existsSync('./tmp/' + body.invoice_file)) {
+                let invoice_file = body.invoice_file;
+                let invoice_file_name = invoice_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                fs.renameSync('./tmp/' + invoice_file, directory + '/' + invoice_file_name);
+
+                order_documents.push({
+                    submission_id: order.id,
+                    type: 'invoice',
+                    doc_number: '-',
+                    path: directoryResult + '/' + invoice_file_name,
+                    created_at: moment(),
+                    updated_at: moment()
+                });
+
+                updated_docs.push('invoice');
+            } else {
+                statusCode = 400;
+                throw new Error(`File dengan nama ${body.invoice_file} tidak tersedia.`);
+            }
+        }
+
+        // Provider
+        if (body.provider_file) {
+            if (fs.existsSync('./tmp/' + body.provider_file)) {
+                let provider_file = body.provider_file;
+                let provider_file_name = provider_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                fs.renameSync('./tmp/' + provider_file, directory + '/' + provider_file_name);
+
+                order_documents.push({
+                    submission_id: order.id,
+                    type: 'provider',
+                    doc_number: '-',
+                    path: directoryResult + '/' + provider_file_name,
+                    created_at: moment(),
+                    updated_at: moment()
+                });
+
+                updated_docs.push('provider');
+            } else {
+                statusCode = 400;
+                throw new Error(`File dengan nama ${body.provider_file} tidak tersedia.`);
+            }
+        }
+
+        // Transporter
+        if (body.transporter_file) {
+            if (fs.existsSync('./tmp/' + body.transporter_file)) {
+                let transporter_file = body.transporter_file;
+                let transporter_file_name = transporter_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                fs.renameSync('./tmp/' + transporter_file, directory + '/' + transporter_file_name);
+
+                order_documents.push({
+                    submission_id: order.id,
+                    type: 'transporter',
+                    doc_number: '-',
+                    path: directoryResult + '/' + transporter_file_name,
+                    created_at: moment(),
+                    updated_at: moment()
+                });
+
+                updated_docs.push('transporter');
+            } else {
+                statusCode = 400;
+                throw new Error(`File dengan nama ${body.transporter_file} tidak tersedia.`);
+            }
+        }
+
+        // Waste Receipt
+        if (body.waste_receipt_file) {
+            if (fs.existsSync('./tmp/' + body.waste_receipt_file)) {
+                let waste_receipt_file = body.waste_receipt_file;
+                let waste_receipt_file_name = waste_receipt_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                fs.renameSync('./tmp/' + waste_receipt_file, directory + '/' + waste_receipt_file_name);
+
+                order_documents.push({
+                    submission_id: order.id,
+                    type: 'waste_receipt',
+                    doc_number: '-',
+                    path: directoryResult + '/' + waste_receipt_file_name,
+                    created_at: moment(),
+                    updated_at: moment()
+                });
+
+                updated_docs.push('waste_receipt');
+            } else {
+                statusCode = 400;
+                throw new Error(`File dengan nama ${body.waste_receipt_file} tidak tersedia.`);
+            }
+        }
+
+        // BAST
+        if (body.bast_file) {
+            if (fs.existsSync('./tmp/' + body.bast_file)) {
+                let bast_file = body.bast_file;
+                let bast_file_name = bast_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                fs.renameSync('./tmp/' + bast_file, directory + '/' + bast_file_name);
+
+                order_documents.push({
+                    submission_id: order.id,
+                    type: 'bast',
+                    doc_number: '-',
+                    path: directoryResult + '/' + bast_file_name,
+                    created_at: moment(),
+                    updated_at: moment()
+                });
+
+                updated_docs.push('bast');
+            } else {
+                statusCode = 400;
+                throw new Error(`File dengan nama ${body.bast_file} tidak tersedia.`);
+            }
+        }
+
+        // Travel Document
+        if (body.travel_document_file) {
+            if (fs.existsSync('./tmp/' + body.travel_document_file)) {
+                let travel_document_file = body.travel_document_file;
+                let travel_document_file_name = travel_document_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                fs.renameSync('./tmp/' + travel_document_file, directory + '/' + travel_document_file_name);
+
+                order_documents.push({
+                    submission_id: order.id,
+                    type: 'travel_document',
+                    doc_number: '-',
+                    path: directoryResult + '/' + travel_document_file_name,
+                    created_at: moment(),
+                    updated_at: moment()
+                });
+
+                updated_docs.push('travel_document');
+            } else {
+                statusCode = 400;
+                throw new Error(`File dengan nama ${body.travel_document_file} tidak tersedia.`);
+            }
+        }
+
+        if (order_documents.length > 0) {
+            let dropExistingDocs = await queryRunner.manager
+                .createQueryBuilder()
+                .delete()
+                .from(SubmissionDocuments)
+                .where('submission_id = :id', { id: order.id })
+                .andWhere('type IN (:...type)', { type: updated_docs })
+                .execute();
+
+            if (!dropExistingDocs) {
+                throw new Error('Fail to update data.');
+            }
+
+            let orderDocuments = await queryRunner.manager
+                .getRepository(SubmissionDocuments)
+                .save(order_documents);
+
+            if (!orderDocuments) {
+                throw new Error('Fail to update data.');
+            }
         }
 
         // COMMIT TRANSACTION
