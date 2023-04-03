@@ -9,8 +9,9 @@ const createTransportationValidation = () => {
         check('year', 'Tahun Kendaraan harus diisi').notEmpty(),
         check('year', 'Tahun Kendaraan harus berupa number').isNumeric(),
         check('capacity', 'Kapasitas harus diisi').notEmpty(),
-        check('fuel_type', 'Jenis Bahan Bakar harus dipilih').notEmpty(),
+        check('fuel_type', 'Jenis Bahan Bakar harus diisi').notEmpty(),
         check('stnk_number', 'No STNK Kendaraan harus diisi').notEmpty(),
+        check('stnk_validity_period', 'Masa Berlaku STNK Kendaraan harus diisi').notEmpty(),
         check('stnk_file').custom((value, { req }) => {
             // Validate file value
             if (!value) {
@@ -38,6 +39,10 @@ const createTransportationValidation = () => {
 
             return true;
         }),
+        check('validity_period_kir', 'Masa berlaku KIR harus diisi').notEmpty(),
+        check('validity_period_rekom', 'Masa berlaku REKOM harus diisi').notEmpty(),
+        check('validity_period_supervision_card', 'Masa berlaku Kartu Pengawasa harus diisi').notEmpty(),
+        check('validity_period_departement_permit', 'Masa berlaku Izin Dinas Perhubungan harus diisi').notEmpty()
     ]
 }
 
@@ -49,7 +54,7 @@ const updateTransportationValidation = () => {
         check('year', 'Tahun Kendaraan harus diisi').notEmpty(),
         check('year', 'Tahun Kendaraan harus berupa number').isNumeric(),
         check('capacity', 'Kapasitas harus diisi').notEmpty(),
-        check('fuel_type', 'Jenis Bahan Bakar harus dipilih').notEmpty(),
+        check('fuel_type', 'Jenis Bahan Bakar harus diisi').notEmpty(),
     ]
 }
 

@@ -88,6 +88,10 @@ export const getListTransportation = async (req, res) => {
                 `t.capacity AS capacity`,
                 `t.fuel_type AS fuel_type`,
                 `t.active AS active`,
+                `t.validity_period_kir AS validity_period_kir`,
+                `t.validity_period_rekom AS validity_period_rekom`,
+                `t.validity_period_supervision_card AS validity_period_supervision_card`,
+                `t.validity_period_departement_permit AS validity_period_departement_permit`,
                 `t.created_at AS created_at`,
                 `t.updated_at AS updated_at`,
                 `tp.name AS transportation_type`,
@@ -166,6 +170,10 @@ export const getDetailTransportation = async (req, res) => {
                 `t.capacity AS capacity`,
                 `t.fuel_type AS fuel_type`,
                 `t.active AS active`,
+                `t.validity_period_kir AS validity_period_kir`,
+                `t.validity_period_rekom AS validity_period_rekom`,
+                `t.validity_period_supervision_card AS validity_period_supervision_card`,
+                `t.validity_period_departement_permit AS validity_period_departement_permit`,
                 `t.created_at AS created_at`,
                 `t.updated_at AS updated_at`,
                 `tp.name AS transportation_type`,
@@ -189,6 +197,7 @@ export const getDetailTransportation = async (req, res) => {
                 `td.type AS type`,
                 `td.path AS path`,
                 `td.doc_number AS doc_number`,
+                `td.validity_period AS validity_period`,
                 `td.created_at AS created_at`,
                 `td.updated_at AS updated_at`
             ])
@@ -250,6 +259,10 @@ export const createTransportation = async (req, res) => {
             capacity: body.capacity,
             fuel_type: body.fuel_type,
             active: false,
+            validity_period_kir: moment(body.validity_period_kir),
+            validity_period_rekom: moment(body.validity_period_rekom),
+            validity_period_supervision_card: moment(body.validity_period_supervision_card),
+            validity_period_departement_permit: moment(body.validity_period_departement_permit),
             created_at: moment.utc(),
             updated_at: moment.utc()
         }
@@ -278,6 +291,7 @@ export const createTransportation = async (req, res) => {
             transportation_id: storeTransportation.id,
             type: 'stnk',
             doc_number: body.stnk_number,
+            validity_period: body.stnk_validity_period,
             path: directoryResult + '/' + stnk_file_name,
             created_at: moment(),
             updated_at: moment()
@@ -378,6 +392,10 @@ export const updateTransportation = async (req, res) => {
             year: body.year,
             capacity: body.capacity,
             fuel_type: body.fuel_type,
+            validity_period_kir: moment(body.validity_period_kir),
+            validity_period_rekom: moment(body.validity_period_rekom),
+            validity_period_supervision_card: moment(body.validity_period_supervision_card),
+            validity_period_departement_permit: moment(body.validity_period_departement_permit),
             updated_at: moment.utc()
         }
 
@@ -387,48 +405,96 @@ export const updateTransportation = async (req, res) => {
             throw new Error('Fail to update data.');
         }
 
-        // // MAPPING TRANSPORTATION DOCUMENT
-        // let transaportation_documents = [];
-        // let directory = `public/api/upload/attachments/transportation`;
-        // let directoryResult = `/api/upload/attachments/transportation`;
+        // MAPPING TRANSPORTATION DOCUMENT
+        let transaportation_documents = [];
+        let updated_docs = [];
+        let directory = `public/api/upload/attachments/transportation/${transportation.id}`;
+        let directoryResult = `/api/upload/attachments/transportation/${transportation.id}`;
 
-        // checkAndCreateDirectory(directory);
+        checkAndCreateDirectory(directory);
 
-        // // STNK
-        // let stnk_file = body.stnk_file;
-        // let stnk_file_name = stnk_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        // fs.renameSync('./tmp/' + stnk_file, directory + '/' + stnk_file_name);
+        // STNK
+        if (body.stnk_file || body.stnk_number || body.stnk_validity_period) {
+            let stnk_file_name = null;
+            if (body.stnk_file) {
+                if (fs.existsSync('./tmp/' + body.stnk_file)) {
+                    let stnk_file = body.stnk_file;
+                    stnk_file_name = stnk_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                    fs.renameSync('./tmp/' + stnk_file, directory + '/' + stnk_file_name);
+                } else {
+                    statusCode = 400;
+                    throw new Error(`File dengan nama ${body.stnk_file} tidak tersedia.`);
+                }
+            }
 
-        // transaportation_documents.push({
-        //     transportation_id: storeTransportation.id,
-        //     type: 'stnk',
-        //     doc_number: body.stnk_number,
-        //     path: directoryResult + '/' + stnk_file_name,
-        //     created_at: moment(),
-        //     updated_at: moment()
-        // });
+            // Get Existing Data
+            let transportationDocsSTNK = await queryRunner.manager
+                .findOne(TransportationDocuments, { transportation_id: transportation.id, deleted_at: null, type: 'stnk' });
 
-        // // Travel Document
-        // let travel_document_file = body.travel_document_file;
-        // let travel_document_file_name = travel_document_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        // fs.renameSync('./tmp/' + travel_document_file, directory + '/' + travel_document_file_name);
+            transaportation_documents.push({
+                transportation_id: transportation.id,
+                type: 'stnk',
+                doc_number: body.stnk_number ? body.stnk_number : transportationDocsSTNK.doc_number,
+                validity_period: body.stnk_validity_period ? body.stnk_validity_period : transportationDocsSTNK.validity_period,
+                path: stnk_file_name ? directoryResult + '/' + stnk_file_name : transportationDocsSTNK.path,
+                created_at: moment(),
+                updated_at: moment()
+            });
 
-        // transaportation_documents.push({
-        //     transportation_id: storeTransportation.id,
-        //     type: 'travel_document',
-        //     doc_number: body.travel_document_number,
-        //     path: directoryResult + '/' + travel_document_file_name,
-        //     created_at: moment(),
-        //     updated_at: moment()
-        // });
+            updated_docs.push('stnk');
+        }
 
-        // let storeTransportationDocuments = await queryRunner.manager
-        //     .getRepository(TransportationDocuments)
-        //     .save(transaportation_documents);
+        // Travel Document
+        if (body.travel_document_file || body.travel_document_number) {
+            let travel_document_file_name = null;
+            if (body.travel_document_file) {
+                if (fs.existsSync('./tmp/' + body.travel_document_file)) {
+                    let travel_document_file = body.travel_document_file;
+                    travel_document_file_name = travel_document_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                    fs.renameSync('./tmp/' + travel_document_file, directory + '/' + travel_document_file_name);
+                } else {
+                    statusCode = 400;
+                    throw new Error(`File dengan nama ${body.travel_document_file} tidak tersedia.`);
+                }
+            }
 
-        // if (!storeTransportationDocuments) {
-        //     throw new Error('Fail to create data.');
-        // }
+            // Get Existing Data
+            let transportationDocsTDocs = await queryRunner.manager
+                .findOne(TransportationDocuments, { transportation_id: transportation.id, deleted_at: null, type: 'travel_document' });
+
+            transaportation_documents.push({
+                transportation_id: transportation.id,
+                type: 'travel_document',
+                doc_number: body.travel_document_number ? body.travel_document_number : transportationDocsTDocs.doc_number,
+                path: travel_document_file_name ? directoryResult + '/' + travel_document_file_name : transportationDocsTDocs.path,
+                created_at: moment(),
+                updated_at: moment()
+            });
+
+            updated_docs.push('travel_document');
+        }
+
+        if (transaportation_documents.length > 0) {
+            let dropExistingDocs = await queryRunner.manager
+                .createQueryBuilder()
+                .delete()
+                .from(TransportationDocuments)
+                .where('transportation_id = :id', { id: transportation.id })
+                .andWhere('type IN (:...type)', { type: updated_docs })
+                .execute();
+
+            if (!dropExistingDocs) {
+                throw new Error('Fail to update data.');
+            }
+
+            let transportationDocuments = await queryRunner.manager
+                .getRepository(TransportationDocuments)
+                .save(transaportation_documents);
+
+            if (!transportationDocuments) {
+                throw new Error('Fail to update data.');
+            }
+        }
 
         // COMMIT TRANSACTION
         await queryRunner.commitTransaction();
