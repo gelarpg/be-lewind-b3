@@ -136,6 +136,7 @@ export const getDetailDriver = async (req, res) => {
                 `dd.type AS type`,
                 `dd.path AS path`,
                 `dd.doc_number AS doc_number`,
+                `dd.validity_period AS validity_period`,
                 `dd.created_at AS created_at`,
                 `dd.updated_at AS updated_at`
             ])
@@ -237,6 +238,7 @@ export const createDriver = async (req, res) => {
             driver_id: storeDriver.id,
             type: 'sim',
             doc_number: body.sim_number,
+            validity_period: moment(body.sim_validity_period),
             path: directoryResult + '/' + sim_file_name,
             created_at: moment(),
             updated_at: moment()
@@ -329,48 +331,96 @@ export const updateDriver = async (req, res) => {
             throw new Error('Fail to update data.');
         }
 
-        // // MAPPING DRIVER DOCUMENT
-        // let driver_documents = [];
-        // let directory = `public/api/upload/attachments/driver`;
-        // let directoryResult = `/api/upload/attachments/driver`;
+        // MAPPING DRIVER DOCUMENT
+        let driver_documents = [];
+        let updated_docs = [];
+        let directory = `public/api/upload/attachments/driver/${driver.id}`;
+        let directoryResult = `/api/upload/attachments/driver/${driver.id}`;
 
-        // checkAndCreateDirectory(directory);
+        checkAndCreateDirectory(directory);
 
-        // // KTP
-        // let ktp_file = body.ktp_file;
-        // let ktp_file_name = ktp_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        // fs.renameSync('./tmp/' + ktp_file, directory + '/' + ktp_file_name);
+        // KTP
+        if (body.ktp_file || body.ktp_number) {
+            let ktp_file_name = null;
+            if (body.ktp_file) {
+                if (fs.existsSync('./tmp/' + body.ktp_file)) {
+                    let ktp_file = body.ktp_file;
+                    ktp_file_name = ktp_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                    fs.renameSync('./tmp/' + ktp_file, directory + '/' + ktp_file_name);
+                } else {
+                    statusCode = 400;
+                    throw new Error(`File dengan nama ${body.ktp_file} tidak tersedia.`);
+                }
+            }
 
-        // driver_documents.push({
-        //     driver_id: updateDriver.id,
-        //     type: 'ktp',
-        //     doc_number: body.ktp_number,
-        //     path: directoryResult + '/' + ktp_file_name,
-        //     created_at: moment(),
-        //     updated_at: moment()
-        // });
+            // Get Existing Data
+            let driverDocsKTP = await queryRunner.manager
+                .findOne(DriverDocuments, { driver_id: driver.id, deleted_at: null, type: 'ktp' });
 
-        // // SIM
-        // let sim_file = body.sim_file;
-        // let sim_file_name = sim_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        // fs.renameSync('./tmp/' + sim_file, directory + '/' + sim_file_name);
+            driver_documents.push({
+                driver_id: driver.id,
+                type: 'ktp',
+                doc_number: body.ktp_number ? body.ktp_number : driverDocsKTP.doc_number,
+                path: ktp_file_name ? directoryResult + '/' + ktp_file_name : driverDocsKTP.path,
+                created_at: moment(),
+                updated_at: moment()
+            });
 
-        // driver_documents.push({
-        //     driver_id: updateDriver.id,
-        //     type: 'sim',
-        //     doc_number: body.sim_number,
-        //     path: directoryResult + '/' + sim_file_name,
-        //     created_at: moment(),
-        //     updated_at: moment()
-        // });
+            updated_docs.push('ktp');
+        }
 
-        // let updateDriverDocuments = await queryRunner.manager
-        //     .getRepository(DriverDocuments)
-        //     .save(driver_documents);
+        // SIM
+        if (body.sim_file || body.sim_number || body.sim_validity_period) {
+            let sim_file_name = null;
+            if (body.sim_file) {
+                if (fs.existsSync('./tmp/' + body.sim_file)) {
+                    let sim_file = body.sim_file;
+                    sim_file_name = sim_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                    fs.renameSync('./tmp/' + sim_file, directory + '/' + sim_file_name);
+                } else {
+                    statusCode = 400;
+                    throw new Error(`File dengan nama ${body.sim_file} tidak tersedia.`);
+                }
+            }
 
-        // if (!updateDriverDocuments) {
-        //     throw new Error('Fail to update data.');
-        // }
+            // Get Existing Data
+            let driverDocsSIM = await queryRunner.manager
+                .findOne(DriverDocuments, { driver_id: driver.id, deleted_at: null, type: 'sim' });
+
+            driver_documents.push({
+                driver_id: driver.id,
+                type: 'sim',
+                doc_number: body.sim_number ? body.sim_number : driverDocsSIM.doc_number,
+                validity_period: body.sim_validity_period ? moment(body.sim_validity_period) : driverDocsSIM.validity_period,
+                path: sim_file_name ? directoryResult + '/' + sim_file_name : driverDocsSIM.path,
+                created_at: moment(),
+                updated_at: moment()
+            });
+
+            updated_docs.push('sim');
+        }
+
+        if (driver_documents.length > 0) {
+            let dropExistingDocs = await queryRunner.manager
+                .createQueryBuilder()
+                .delete()
+                .from(DriverDocuments)
+                .where('driver_id = :id', { id: driver.id })
+                .andWhere('type IN (:...type)', { type: updated_docs })
+                .execute();
+
+            if (!dropExistingDocs) {
+                throw new Error('Fail to update data.');
+            }
+
+            let driverDocuments = await queryRunner.manager
+                .getRepository(DriverDocuments)
+                .save(driver_documents);
+
+            if (!driverDocuments) {
+                throw new Error('Fail to update data.');
+            }
+        }
 
         // COMMIT TRANSACTION
         await queryRunner.commitTransaction();

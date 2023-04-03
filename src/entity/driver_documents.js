@@ -26,6 +26,11 @@ const DriverDocuments = new EntitySchema({
         path: {
             type: "text"
         },
+        validity_period: {
+            type: "timestamp",
+            nullable: true,
+            default: null,
+        },
         created_at: {
             type: "timestamp",
             nullable: true,

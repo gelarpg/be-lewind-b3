@@ -291,7 +291,7 @@ export const createTransportation = async (req, res) => {
             transportation_id: storeTransportation.id,
             type: 'stnk',
             doc_number: body.stnk_number,
-            validity_period: body.stnk_validity_period,
+            validity_period: moment(body.stnk_validity_period),
             path: directoryResult + '/' + stnk_file_name,
             created_at: moment(),
             updated_at: moment()
@@ -435,7 +435,7 @@ export const updateTransportation = async (req, res) => {
                 transportation_id: transportation.id,
                 type: 'stnk',
                 doc_number: body.stnk_number ? body.stnk_number : transportationDocsSTNK.doc_number,
-                validity_period: body.stnk_validity_period ? body.stnk_validity_period : transportationDocsSTNK.validity_period,
+                validity_period: body.stnk_validity_period ? moment(body.stnk_validity_period) : transportationDocsSTNK.validity_period,
                 path: stnk_file_name ? directoryResult + '/' + stnk_file_name : transportationDocsSTNK.path,
                 created_at: moment(),
                 updated_at: moment()

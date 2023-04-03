@@ -22,7 +22,8 @@ const createDriverValidation = () => {
 
             return true;
         }),
-        check('sim_number', 'NIK harus diisi').notEmpty(),
+        check('sim_number', 'Nomor SIM harus diisi').notEmpty(),
+        check('sim_validity_period', 'Masa Berlaku SIM harus diisi').notEmpty(),
         check('sim_file').custom((value, { req }) => {
             // Validate file value
             if (!value) {
