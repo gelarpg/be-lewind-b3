@@ -43,6 +43,7 @@ export const getListClients = async (req, res) => {
                 `c.created_at AS created_at`,
                 `c.updated_at AS updated_at`,
                 `w.name AS waste_name`,
+                `w.price_unit AS waste_price_unit`,
                 `wt.name AS waste_type`,
             ])
             .leftJoin(Waste, 'w', 'w.id = c.waste_id')

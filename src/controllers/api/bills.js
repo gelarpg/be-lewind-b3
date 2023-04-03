@@ -158,6 +158,7 @@ export const getDetailBills = async (req, res) => {
                 `t.name AS transportation_name`,
                 `w.id AS waste_id`,
                 `w.name AS waste_name`,
+                `w.price_unit AS waste_price_unit`,
                 `wt.id AS waste_type_id`,
                 `wt.name AS waste_type`,
             ])
