@@ -45,7 +45,7 @@ export const getListUsers = async (req, res) => {
             .where('u.deleted_at IS NULL');
 
         let report = await query
-            .skip(from)
+            .offset(from)
             .limit(limit)
             .getRawMany();
 

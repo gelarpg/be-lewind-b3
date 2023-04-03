@@ -100,9 +100,11 @@ export const getListTransportation = async (req, res) => {
             .where('t.deleted_at IS NULL');
 
         let report = await query
-            .skip(from)
+            .offset(from)
             .limit(limit)
             .getRawMany();
+
+        console.log(from, limit);
 
         // Create paginator
         let count = await query.getCount();

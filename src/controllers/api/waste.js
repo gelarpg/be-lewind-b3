@@ -92,7 +92,7 @@ export const getListWaste = async (req, res) => {
             .where('w.deleted_at IS NULL');
 
         let report = await query
-            .skip(from)
+            .offset(from)
             .limit(limit)
             .getRawMany();
 

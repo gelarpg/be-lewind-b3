@@ -50,7 +50,7 @@ export const getListClients = async (req, res) => {
             .where('c.deleted_at IS NULL');
 
         let report = await query
-            .skip(from)
+            .offset(from)
             .limit(limit)
             .getRawMany();
 

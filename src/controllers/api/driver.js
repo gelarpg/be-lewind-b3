@@ -47,7 +47,7 @@ export const getListDriver = async (req, res) => {
             .where('d.deleted_at IS NULL');
 
         let report = await query
-            .skip(from)
+            .offset(from)
             .limit(limit)
             .getRawMany();
 

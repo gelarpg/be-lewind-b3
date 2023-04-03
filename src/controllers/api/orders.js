@@ -79,7 +79,7 @@ export const getListOrders = async (req, res) => {
         }
 
         let report = await query
-            .skip(from)
+            .offset(from)
             .limit(limit)
             .getRawMany();
 
