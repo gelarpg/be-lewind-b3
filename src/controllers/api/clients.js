@@ -36,6 +36,7 @@ export const getListClients = async (req, res) => {
             .select([
                 `c.id AS id`,
                 `c.name AS name`,
+                `c.company_name AS company_name`,
                 `c.address AS address`,
                 `c.offer_number AS offer_number`,
                 `c.transaction_fee AS transaction_fee`,
@@ -114,6 +115,7 @@ export const getDetailClients = async (req, res) => {
             .select([
                 `c.id AS id`,
                 `c.name AS name`,
+                `c.company_name AS company_name`,
                 `c.address AS address`,
                 `c.offer_number AS offer_number`,
                 `c.transaction_fee AS transaction_fee`,
@@ -185,6 +187,7 @@ export const createClients = async (req, res) => {
         // Create Data
         let data = {
             name: body.name,
+            company_name: body.company_name,
             waste_id: body.waste_id,
             address: body.address,
             offer_number: body.offer_number,
@@ -268,6 +271,7 @@ export const updateClients = async (req, res) => {
         let dataUpdated = {
             ...clients,
             name: body.name,
+            company_name: body.company_name,
             waste_id: body.waste_id,
             address: body.address,
             offer_number: body.offer_number,
