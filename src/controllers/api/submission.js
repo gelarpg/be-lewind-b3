@@ -92,6 +92,7 @@ export const getListSubmission = async (req, res) => {
                 `s.id AS id`,
                 `s.period AS period`,
                 `s.service_fee AS service_fee`,
+                `s.travel_fee_status AS travel_fee`,
                 `s.status AS status`,
                 `ss.name AS status_name`,
                 `s.created_at AS created_at`,
@@ -182,6 +183,7 @@ export const getDetailSubmission = async (req, res) => {
                 `s.id AS id`,
                 `s.period AS period`,
                 `s.service_fee AS service_fee`,
+                `s.travel_fee_status AS travel_fee`,
                 `s.status AS status`,
                 `s.created_at AS created_at`,
                 `s.updated_at AS updated_at`,
@@ -275,10 +277,11 @@ export const createSubmission = async (req, res) => {
         // Create Data
         let data = {
             client_id: body.client_id,
-            driver_id: body.driver_id,
-            transportation_id: body.transportation_id,
-            period: body.period,
-            service_fee: body.service_fee,
+            // driver_id: body.driver_id,
+            // transportation_id: body.transportation_id,
+            // period: body.period,
+            // service_fee: body.service_fee,
+            // travel_fee_status: body.travel_fee,
             status: 1,
             created_at: moment.utc(),
             updated_at: moment.utc()
@@ -493,12 +496,31 @@ export const updateSubmission = async (req, res) => {
         // Create Data
         let dataUpdated = {
             ...submission,
-            client_id: body.client_id,
-            driver_id: body.driver_id,
-            transportation_id: body.transportation_id,
-            period: body.period,
-            service_fee: body.service_fee,
             updated_at: moment.utc()
+        }
+
+        if (body.client_id) {
+            dataUpdated.client_id = body.client_id;
+        }
+
+        if (body.driver_id) {
+            dataUpdated.driver_id = body.driver_id;
+        }
+
+        if (body.transportation_id) {
+            dataUpdated.transportation_id = body.transportation_id;
+        }
+
+        if (body.period) {
+            dataUpdated.period = body.period;
+        }
+
+        if (body.service_fee) {
+            dataUpdated.service_fee = body.service_fee;
+        }
+
+        if (body.travel_fee_status) {
+            dataUpdated.travel_fee_status = body.travel_fee;
         }
 
         const updateSubmission = await queryRunner.manager.save(Submission, dataUpdated);

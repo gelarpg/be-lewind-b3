@@ -3,12 +3,12 @@ import fs from 'fs';
 
 const createSubmissionValidation = () => {
     return [
-        check('driver_id', 'Driver harus diisi').notEmpty(),
+        // check('driver_id', 'Driver harus diisi').notEmpty(),
         check('client_id', 'Client harus diisi').notEmpty(),
-        check('transportation_id', 'Transportasi harus diisi').notEmpty(),
-        check('period', 'Periode harus diisi').notEmpty(),
-        check('service_fee', 'Biaya Layanan harus diisi').notEmpty(),
-        check('service_fee', 'Biaya Layanan harus berupa angka').isNumeric(),
+        // check('transportation_id', 'Transportasi harus diisi').notEmpty(),
+        // check('period', 'Periode harus diisi').notEmpty(),
+        // check('service_fee', 'Biaya Layanan harus diisi').notEmpty(),
+        // check('service_fee', 'Biaya Layanan harus berupa angka').isNumeric(),
         // check('service_fee_file').custom((value, { req }) => {
         //     // Validate file value
         //     if (!value) {
@@ -105,19 +105,76 @@ const createSubmissionValidation = () => {
 
 const updateSubmissionValidation = () => {
     return [
-        check('driver_id', 'Driver harus diisi').notEmpty(),
-        check('client_id', 'Client harus diisi').notEmpty(),
-        check('transportation_id', 'Transportasi harus diisi').notEmpty(),
-        check('period', 'Periode harus diisi').notEmpty(),
-        check('service_fee', 'Biaya Layanan harus diisi').notEmpty(),
-        check('service_fee', 'Biaya Layanan harus berupa angka').isNumeric(),
-        // check('service_fee_file', 'Dokumen Biaya Layanan harus diisi').notEmpty(),
-        // check('invoice_file', 'Dokumen Invoice harus diisi').notEmpty(),
-        // check('provider_file', 'Dokumen Penyedia harus diisi').notEmpty(),
-        // check('transporter_file', 'Dokumen Transporter harus diisi').notEmpty(),
-        // check('waste_receipt_file', 'Dokumen Penerima Limbah harus diisi').notEmpty(),
-        // check('bast_file', 'Dokumen BAST harus diisi').notEmpty(),
-        // check('travel_document_file', 'Dokumen Surat Jalan harus diisi').notEmpty(),
+        // check('client_id').custom((value, { req }) => {
+        //     // Validate file value
+        //     if (req.user.role == 'perencanaan') {
+        //         if (!value) {
+        //             return Promise.reject('Client harus diisi');
+        //         }
+        //     }
+
+        //     return true;
+        // }),
+        // check('driver_id').custom((value, { req }) => {
+        //     // Validate file value
+        //     if (req.user.role == 'operasional') {
+        //         if (!value) {
+        //             return Promise.reject('Driver harus diisi');
+        //         }
+        //     }
+
+        //     return true;
+        // }),
+        // check('transportation_id').custom((value, { req }) => {
+        //     // Validate file value
+        //     if (req.user.role == 'operasional') {
+        //         if (!value) {
+        //             return Promise.reject('Transportasi harus diisi');
+        //         }
+        //     }
+
+        //     return true;
+        // }),
+        // check('period').custom((value, { req }) => {
+        //     // Validate file value
+        //     if (req.user.role == 'operasional') {
+        //         if (!value) {
+        //             return Promise.reject('Periode harus diisi');
+        //         }
+        //     }
+
+        //     return true;
+        // }),
+        // check('service_fee').custom((value, { req }) => {
+        //     // Validate file value
+        //     if (req.user.role == 'operasional') {
+        //         if (!value) {
+        //             return Promise.reject('Biaya Layanan harus diisi');
+        //         }
+        //     }
+
+        //     return true;
+        // }),
+        // check('service_fee').custom((value, { req }) => {
+        //     // Validate file value
+        //     if (req.user.role == 'operasional') {
+        //         if (!value) {
+        //             return Promise.reject('Biaya Layanan harus diisi');
+        //         }
+        //     }
+
+        //     return true;
+        // }),
+        // check('travel_fee').custom((value, { req }) => {
+        //     // Validate file value
+        //     if (req.user.role == 'operasional') {
+        //         if (!value) {
+        //             return Promise.reject('Status Biaya Perjalanan harus diisi');
+        //         }
+        //     }
+
+        //     return true;
+        // }),
     ]
 }
 

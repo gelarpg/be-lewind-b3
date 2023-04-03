@@ -17,6 +17,8 @@ const Submission = new EntitySchema({
         },
         driver_id: {
             type: "integer",
+            default: null,
+            nullable: true,
             Index
         },
         client_id: {
@@ -25,13 +27,19 @@ const Submission = new EntitySchema({
         },
         transportation_id: {
             type: "integer",
+            default: null,
+            nullable: true,
             Index
         },
         period: {
-            type: "date"
+            type: "date",
+            default: null,
+            nullable: true
         },
         service_fee: {
-            type: "double precision"
+            type: "double precision",
+            default: null,
+            nullable: true
         },
         status: {
             type: "integer",
@@ -39,6 +47,11 @@ const Submission = new EntitySchema({
             nullable: true
         },
         payment_status: {
+            type: "boolean",
+            default: false,
+            nullable: true
+        },
+        travel_fee_status: {
             type: "boolean",
             default: false,
             nullable: true
