@@ -93,6 +93,7 @@ export const getListSubmission = async (req, res) => {
                 `s.period AS period`,
                 `s.service_fee AS service_fee`,
                 `s.travel_fee_status AS travel_fee`,
+                `s.waste_cost AS waste_cost`,
                 `s.status AS status`,
                 `ss.name AS status_name`,
                 `s.created_at AS created_at`,
@@ -185,6 +186,7 @@ export const getDetailSubmission = async (req, res) => {
                 `s.service_fee AS service_fee`,
                 `s.travel_fee_status AS travel_fee`,
                 `s.status AS status`,
+                `s.waste_cost AS waste_cost`,
                 `s.created_at AS created_at`,
                 `s.updated_at AS updated_at`,
                 `c.id AS client_id`,
@@ -277,6 +279,7 @@ export const createSubmission = async (req, res) => {
         // Create Data
         let data = {
             client_id: body.client_id,
+            waste_cost: body.waste_cost,
             // driver_id: body.driver_id,
             // transportation_id: body.transportation_id,
             // period: body.period,
@@ -501,6 +504,10 @@ export const updateSubmission = async (req, res) => {
 
         if (body.client_id) {
             dataUpdated.client_id = body.client_id;
+        }
+
+        if (body.waste_cost) {
+            dataUpdated.waste_cost = body.waste_cost;
         }
 
         if (body.driver_id) {

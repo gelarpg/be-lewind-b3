@@ -46,6 +46,11 @@ const Submission = new EntitySchema({
             default: null,
             nullable: true
         },
+        waste_cost: {
+            type: "integer",
+            default: null,
+            nullable: true
+        },
         payment_status: {
             type: "boolean",
             default: false,
