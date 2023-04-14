@@ -113,6 +113,7 @@ export const getDetailTransportationLicense = async (req, res) => {
         let query = connection.createQueryBuilder(TransportationLicense, 'l')
             .select([
                 `l.id AS id`,
+                `t.id AS transportation_id`,
                 `t.name AS name`,
                 `t.no_police AS no_police`,
                 `l.validity_period_stnk AS validity_period_stnk`,
