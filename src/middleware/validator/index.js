@@ -4,6 +4,7 @@ import * as auth from './auth';
 import * as users from './users';
 import * as driver from './driver';
 import * as transportation from './transportation';
+import * as transportation_license from './transportation_license';
 import * as waste from './waste';
 import * as clients from './clients';
 import * as submission from './submission';
@@ -25,5 +26,6 @@ module.exports = {
     transportation,
     waste,
     clients,
-    submission
+    submission,
+    transportation_license
 }
