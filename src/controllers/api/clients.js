@@ -6,6 +6,7 @@ import { validate } from '../../middleware/validator';
 import moment from "moment";
 import Waste from "../../entity/waste";
 import WasteType from "../../entity/waste_type";
+import ClientsWaste from "../../entity/clients_waste";
 
 export const getListClients = async (req, res) => {
     // RESPONSE
@@ -41,13 +42,8 @@ export const getListClients = async (req, res) => {
                 `c.offer_number AS offer_number`,
                 `c.transaction_fee AS transaction_fee`,
                 `c.created_at AS created_at`,
-                `c.updated_at AS updated_at`,
-                `w.name AS waste_name`,
-                `w.price_unit AS waste_price_unit`,
-                `wt.name AS waste_type`,
+                `c.updated_at AS updated_at`
             ])
-            .leftJoin(Waste, 'w', 'w.id = c.waste_id')
-            .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
             .where('c.deleted_at IS NULL');
 
         let report = await query
@@ -121,16 +117,8 @@ export const getDetailClients = async (req, res) => {
                 `c.offer_number AS offer_number`,
                 `c.transaction_fee AS transaction_fee`,
                 `c.created_at AS created_at`,
-                `c.updated_at AS updated_at`,
-                `w.id AS waste_id`,
-                `w.name AS waste_name`,
-                `wt.id AS waste_type_id`,
-                `wt.name AS waste_type`,
-                `w.weight_unit AS waste_weight_unit`,
-                `w.price_unit AS waste_price_unit`
+                `c.updated_at AS updated_at`
             ])
-            .leftJoin(Waste, 'w', 'w.id = c.waste_id')
-            .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
             .where('c.deleted_at IS NULL')
             .andWhere('c.id = :id', { id: id });
 
@@ -141,6 +129,25 @@ export const getDetailClients = async (req, res) => {
             statusCode = 404;
             throw new Error("Data tidak ditemukan.");
         }
+
+        let wasteList = await connection.createQueryBuilder(ClientsWaste, 'cw')
+            .select([
+                `cw.id AS id`,
+                `cw.client_id AS client_id`,
+                `cw.waste_id AS waste_id`,
+                `w.name AS waste_name`,
+                `wt.id AS waste_type_id`,
+                `wt.name AS waste_type`,
+                `w.weight_unit AS waste_weight_unit`,
+                `w.price_unit AS waste_price_unit`
+            ])
+            .leftJoin(Waste, 'w', 'w.id = cw.waste_id')
+            .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
+            .where('cw.deleted_at IS NULL')
+            .andWhere('cw.client_id = :client_id', { client_id: report.id })
+            .getRawMany();
+
+        report['waste'] = wasteList;
 
         response = responseSuccess(200, "Success!", report);
 
@@ -189,7 +196,7 @@ export const createClients = async (req, res) => {
         let data = {
             name: body.name,
             company_name: body.company_name,
-            waste_id: body.waste_id,
+            // waste_id: body.waste_id,
             address: body.address,
             offer_number: body.offer_number,
             transaction_fee: body.transaction_fee,
@@ -203,6 +210,28 @@ export const createClients = async (req, res) => {
 
         if (!storeClients) {
             throw new Error('Fail to create data.');
+        }
+
+        let clients_waste = [];
+
+        let wasteList = body.waste ? body.waste : [];
+        if (wasteList.length > 0) {
+            for (const item of wasteList) {
+                clients_waste.push({
+                    client_id: storeClients.id,
+                    waste_id: item,
+                    created_at: moment().utc(),
+                    updated_at: moment().utc()
+                });
+            }
+
+            let storeClientsWaste = await queryRunner.manager
+                .getRepository(ClientsWaste)
+                .save(clients_waste);
+
+            if (!storeClientsWaste) {
+                throw new Error('Fail to create data.');
+            }
         }
 
         // COMMIT TRANSACTION
@@ -284,6 +313,39 @@ export const updateClients = async (req, res) => {
 
         if (!updateClients) {
             throw new Error('Fail to update data.');
+        }
+
+        let clients_waste = [];
+
+        let wasteList = body.waste ? body.waste : [];
+        if (wasteList.length > 0) {
+            for (const item of wasteList) {
+                clients_waste.push({
+                    client_id: clients.id,
+                    waste_id: item,
+                    created_at: moment().utc(),
+                    updated_at: moment().utc()
+                });
+            }
+
+            let dropExistingClientWaste = await queryRunner.manager
+                .createQueryBuilder()
+                .delete()
+                .from(ClientsWaste)
+                .where('client_id = :id', { id: clients.id })
+                .execute();
+
+            if (!dropExistingClientWaste) {
+                throw new Error('Fail to create data.');
+            }
+
+            let storeClientsWaste = await queryRunner.manager
+                .getRepository(ClientsWaste)
+                .save(clients_waste);
+
+            if (!storeClientsWaste) {
+                throw new Error('Fail to create data.');
+            }
         }
 
         // COMMIT TRANSACTION

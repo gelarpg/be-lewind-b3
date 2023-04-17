@@ -1,7 +1,7 @@
 const { EntitySchema, Index } = require('typeorm');
 
-const Clients = new EntitySchema({
-    name: "Clients",
+const ClientsWaste = new EntitySchema({
+    name: "ClientsWaste",
     columns: {
         id: {
             primary: true,
@@ -9,26 +9,13 @@ const Clients = new EntitySchema({
             generated: true,
             Index
         },
-        name: {
-            type: "varchar",
+        client_id: {
+            type: "integer",
             Index
         },
-        company_name: {
-            type: "varchar",
-            default: null,
-            nullable: true,
+        waste_id: {
+            type: "integer",
             Index
-        },
-        address: {
-            type: "text"
-        },
-        offer_number: {
-            type: "varchar"
-        },
-        transaction_fee: {
-            type: "double precision",
-            default: 0,
-            nullable: true
         },
         created_at: {
             type: "timestamp",
@@ -48,4 +35,4 @@ const Clients = new EntitySchema({
     }
 });
 
-module.exports = Clients;
+module.exports = ClientsWaste;

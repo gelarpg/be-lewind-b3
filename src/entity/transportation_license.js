@@ -18,8 +18,18 @@ const TransportationLicense = new EntitySchema({
             nullable: true,
             default: null,
         },
+        attachment_kir: {
+            type: "text",
+            nullable: true,
+            default: null,
+        },
         validity_period_stnk: {
             type: "timestamp",
+            nullable: true,
+            default: null,
+        },
+        attachment_stnk: {
+            type: "text",
             nullable: true,
             default: null,
         },
@@ -28,13 +38,28 @@ const TransportationLicense = new EntitySchema({
             nullable: true,
             default: null,
         },
+        attachment_rekom: {
+            type: "text",
+            nullable: true,
+            default: null,
+        },
         validity_period_supervision_card: {
             type: "timestamp",
             nullable: true,
             default: null,
         },
+        attachment_supervision_card: {
+            type: "text",
+            nullable: true,
+            default: null,
+        },
         validity_period_departement_permit: {
             type: "timestamp",
+            nullable: true,
+            default: null,
+        },
+        attachment_departement_permit: {
+            type: "text",
             nullable: true,
             default: null,
         },

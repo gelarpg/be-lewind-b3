@@ -121,6 +121,11 @@ export const getDetailTransportationLicense = async (req, res) => {
                 `l.validity_period_rekom AS validity_period_rekom`,
                 `l.validity_period_supervision_card AS validity_period_supervision_card`,
                 `l.validity_period_departement_permit AS validity_period_departement_permit`,
+                `l.attachment_kir AS attachment_kir`,
+                `l.attachment_stnk AS attachment_stnk`,
+                `l.attachment_rekom AS attachment_rekom`,
+                `l.attachment_supervision_card AS attachment_supervision_card`,
+                `l.attachment_departement_permit AS attachment_departement_permit`,
                 `l.created_at AS created_at`,
                 `l.updated_at AS updated_at`
             ])
@@ -190,6 +195,57 @@ export const createTransportationLicense = async (req, res) => {
             validity_period_departement_permit: moment(body.validity_period_departement_permit),
             created_at: moment.utc(),
             updated_at: moment.utc()
+        }
+
+        // MAPPING TRANSPORTATION LICENSE DOCUMENT
+        let directory = `public/api/upload/attachments/transportation/${body.transportation_id}`;
+        let directoryResult = `/api/upload/attachments/transportation/${body.transportation_id}`;
+
+        checkAndCreateDirectory(directory);
+
+        // STNK
+        if (body.attachment_stnk) {
+            let attachment_stnk = body.attachment_stnk;
+            let attachment_stnk_name = attachment_stnk.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            fs.renameSync('./tmp/' + attachment_stnk, directory + '/' + attachment_stnk_name);
+
+            data['attachment_stnk'] = directoryResult + '/' + attachment_stnk_name;
+        }
+
+        // KIR
+        if (body.attachment_kir) {
+            let attachment_kir = body.attachment_kir;
+            let attachment_kir_name = attachment_kir.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            fs.renameSync('./tmp/' + attachment_kir, directory + '/' + attachment_kir_name);
+
+            data['attachment_kir'] = directoryResult + '/' + attachment_kir_name;
+        }
+
+        // REKOM
+        if (body.attachment_rekom) {
+            let attachment_rekom = body.attachment_rekom;
+            let attachment_rekom_name = attachment_rekom.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            fs.renameSync('./tmp/' + attachment_rekom, directory + '/' + attachment_rekom_name);
+
+            data['attachment_rekom'] = directoryResult + '/' + attachment_rekom_name;
+        }
+
+        // SUPERVISON CARD
+        if (body.attachment_supervision_card) {
+            let attachment_supervision_card = body.attachment_supervision_card;
+            let attachment_supervision_card_name = attachment_supervision_card.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            fs.renameSync('./tmp/' + attachment_supervision_card, directory + '/' + attachment_supervision_card_name);
+
+            data['attachment_supervision_card'] = directoryResult + '/' + attachment_supervision_card_name;
+        }
+
+        // DEPARTEMENT PERMIT
+        if (body.attachment_departement_permit) {
+            let attachment_departement_permit = body.attachment_departement_permit;
+            let attachment_departement_permit_name = attachment_departement_permit.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            fs.renameSync('./tmp/' + attachment_departement_permit, directory + '/' + attachment_departement_permit_name);
+
+            data['attachment_departement_permit'] = directoryResult + '/' + attachment_departement_permit_name;
         }
 
         let storeTransportationLicense = await queryRunner.manager
@@ -273,6 +329,48 @@ export const updateTransportationLicense = async (req, res) => {
             validity_period_supervision_card: moment(body.validity_period_supervision_card),
             validity_period_departement_permit: moment(body.validity_period_departement_permit),
             updated_at: moment.utc()
+        }
+
+        // MAPPING TRANSPORTATION LICENSE DOCUMENT
+        let directory = `public/api/upload/attachments/transportation/${body.transportation_id}`;
+        let directoryResult = `/api/upload/attachments/transportation/${body.transportation_id}`;
+
+        checkAndCreateDirectory(directory);
+
+        // KIR
+        if (body.attachment_kir) {
+            let attachment_kir = body.attachment_kir;
+            let attachment_kir_name = attachment_kir.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            fs.renameSync('./tmp/' + attachment_kir, directory + '/' + attachment_kir_name);
+
+            dataUpdated['attachment_kir'] = directoryResult + '/' + attachment_kir_name;
+        }
+
+        // REKOM
+        if (body.attachment_rekom) {
+            let attachment_rekom = body.attachment_rekom;
+            let attachment_rekom_name = attachment_rekom.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            fs.renameSync('./tmp/' + attachment_rekom, directory + '/' + attachment_rekom_name);
+
+            dataUpdated['attachment_rekom'] = directoryResult + '/' + attachment_rekom_name;
+        }
+
+        // SUPERVISON CARD
+        if (body.attachment_supervision_card) {
+            let attachment_supervision_card = body.attachment_supervision_card;
+            let attachment_supervision_card_name = attachment_supervision_card.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            fs.renameSync('./tmp/' + attachment_supervision_card, directory + '/' + attachment_supervision_card_name);
+
+            dataUpdated['attachment_supervision_card'] = directoryResult + '/' + attachment_supervision_card_name;
+        }
+
+        // DEPARTEMENT PERMIT
+        if (body.attachment_departement_permit) {
+            let attachment_departement_permit = body.attachment_departement_permit;
+            let attachment_departement_permit_name = attachment_departement_permit.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            fs.renameSync('./tmp/' + attachment_departement_permit, directory + '/' + attachment_departement_permit_name);
+
+            dataUpdated['attachment_departement_permit'] = directoryResult + '/' + attachment_departement_permit_name;
         }
 
         const updateTransportationLicense = await queryRunner.manager.save(TransportationLicense, dataUpdated);
