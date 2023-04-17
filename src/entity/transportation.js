@@ -33,26 +33,6 @@ const Transportation = new EntitySchema({
         active: {
             type: "boolean"
         },
-        validity_period_kir: {
-            type: "timestamp",
-            nullable: true,
-            default: null,
-        },
-        validity_period_rekom: {
-            type: "timestamp",
-            nullable: true,
-            default: null,
-        },
-        validity_period_supervision_card: {
-            type: "timestamp",
-            nullable: true,
-            default: null,
-        },
-        validity_period_departement_permit: {
-            type: "timestamp",
-            nullable: true,
-            default: null,
-        },
         created_at: {
             type: "timestamp",
             nullable: true,
