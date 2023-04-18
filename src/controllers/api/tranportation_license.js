@@ -188,7 +188,7 @@ export const createTransportationLicense = async (req, res) => {
         let data = {
             name: body.name,
             transportation_id: body.transportation_id,
-            validity_period_stnk: moment(body.validity_period_kir),
+            validity_period_stnk: moment(body.validity_period_stnk),
             validity_period_kir: moment(body.validity_period_kir),
             validity_period_rekom: moment(body.validity_period_rekom),
             validity_period_supervision_card: moment(body.validity_period_supervision_card),
