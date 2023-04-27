@@ -12,6 +12,7 @@ import WasteType from "../../entity/waste_type";
 import { calculateDashboardInput } from "./dashboard";
 import { checkAndCreateDirectory } from "../../middleware/helper";
 import fs from 'fs';
+import SubmissionDetails from "../../entity/submission_details";
 
 export const getListOrders = async (req, res) => {
     // RESPONSE
@@ -53,12 +54,12 @@ export const getListOrders = async (req, res) => {
                 `c.name AS client_name`,
                 `d.name AS driver_name`,
                 `t.name AS transportation_name`,
-                `w.name AS waste_name`,
-                `wt.name AS waste_type`,
+                // `w.name AS waste_name`,
+                // `wt.name AS waste_type`,
             ])
             .leftJoin(Clients, 'c', 'c.id = s.client_id')
-            .leftJoin(Waste, 'w', 'w.id = c.waste_id')
-            .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
+            // .leftJoin(Waste, 'w', 'w.id = c.waste_id')
+            // .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
             .leftJoin(Driver, 'd', 'd.id = s.driver_id')
             .leftJoin(Transportation, 't', 't.id = s.transportation_id')
             .leftJoin(SubmissionStatus, 'ss', 'ss.id = s.status')
@@ -158,15 +159,15 @@ export const getDetailOrder = async (req, res) => {
                 `d.name AS driver_name`,
                 `t.id AS transportation_id`,
                 `t.name AS transportation_name`,
-                `w.id AS waste_id`,
-                `w.name AS waste_name`,
-                `w.price_unit AS waste_price_unit`,
-                `wt.id AS waste_type_id`,
-                `wt.name AS waste_type`,
+                // `w.id AS waste_id`,
+                // `w.name AS waste_name`,
+                // `w.price_unit AS waste_price_unit`,
+                // `wt.id AS waste_type_id`,
+                // `wt.name AS waste_type`,
             ])
             .leftJoin(Clients, 'c', 'c.id = s.client_id')
-            .leftJoin(Waste, 'w', 'w.id = c.waste_id')
-            .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
+            // .leftJoin(Waste, 'w', 'w.id = c.waste_id')
+            // .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
             .leftJoin(Driver, 'd', 'd.id = s.driver_id')
             .leftJoin(Transportation, 't', 't.id = s.transportation_id')
             .leftJoin(SubmissionStatus, 'ss', 'ss.id = s.status')
@@ -196,6 +197,25 @@ export const getDetailOrder = async (req, res) => {
             .getRawMany();
 
         report['documents'] = documents;
+
+        let submissionDetails = await connection.createQueryBuilder(SubmissionDetails, 'sd')
+            .select([
+                `sd.id AS id`,
+                `sd.waste_id AS waste_id`,
+                `sd.qty AS qty`,
+                `sd.total AS total`,
+                `w.name AS waste_name`,
+                `w.price_unit AS waste_price_unit`,
+                `wt.id AS waste_type_id`,
+                `wt.name AS waste_type`,
+            ])
+            .leftJoin(Waste, 'w', 'w.id = sd.waste_id')
+            .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
+            .where('sd.deleted_at IS NULL')
+            .andWhere('sd.submission_id = :sid', { sid: report.id })
+            .getRawMany();
+
+        report['submission_details'] = submissionDetails;
 
         response = responseSuccess(200, "Success!", report);
 

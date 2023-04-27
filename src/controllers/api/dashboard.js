@@ -179,17 +179,15 @@ export const getDashbaords = async (req, res) => {
                 'wt.name as name',
                 `(
                     SELECT COUNT(w.id) 
-                    FROM submission s 
-                    LEFT JOIN clients c
-                        ON s.client_id = c.id
+                    FROM submission_details sd 
                     LEFT JOIN waste w
-                        ON c.waste_id = w.id
+                        ON sd.waste_id = w.id
                     LEFT JOIN waste_type wt2
                         ON wt2.id = w.waste_type_id
                     WHERE wt2.id = wt.id 
-                        AND s.deleted_at IS NULL
-                        AND s.created_at >= '${start_date}'
-                        AND s.created_at <= '${end_date}')::int as total`
+                        AND sd.deleted_at IS NULL
+                        AND sd.created_at >= '${start_date}'
+                        AND sd.created_at <= '${end_date}')::int as total`
             ])
             .getRawMany();
 

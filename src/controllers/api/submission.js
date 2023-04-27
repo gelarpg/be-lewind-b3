@@ -14,6 +14,7 @@ import { checkAndCreateDirectory } from "../../middleware/helper";
 import fs from 'fs';
 import WasteType from "../../entity/waste_type";
 import { calculateDashboardInput } from "./dashboard";
+import SubmissionDetails from "../../entity/submission_details";
 
 export const getListSubmissionStatus = async (req, res) => {
     // RESPONSE
@@ -101,12 +102,12 @@ export const getListSubmission = async (req, res) => {
                 `c.name AS client_name`,
                 `d.name AS driver_name`,
                 `t.name AS transportation_name`,
-                `w.name AS waste_name`,
-                `wt.name AS waste_type`,
+                // `w.name AS waste_name`,
+                // `wt.name AS waste_type`,
             ])
             .leftJoin(Clients, 'c', 'c.id = s.client_id')
-            .leftJoin(Waste, 'w', 'w.id = c.waste_id')
-            .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
+            // .leftJoin(Waste, 'w', 'w.id = c.waste_id')
+            // .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
             .leftJoin(Driver, 'd', 'd.id = s.driver_id')
             .leftJoin(Transportation, 't', 't.id = s.transportation_id')
             .leftJoin(SubmissionStatus, 'ss', 'ss.id = s.status')
@@ -196,15 +197,15 @@ export const getDetailSubmission = async (req, res) => {
                 `d.name AS driver_name`,
                 `t.id AS transportation_id`,
                 `t.name AS transportation_name`,
-                `w.id AS waste_id`,
-                `w.name AS waste_name`,
-                `w.price_unit AS waste_price_unit`,
-                `wt.id AS waste_type_id`,
-                `wt.name AS waste_type`,
+                // `w.id AS waste_id`,
+                // `w.name AS waste_name`,
+                // `w.price_unit AS waste_price_unit`,
+                // `wt.id AS waste_type_id`,
+                // `wt.name AS waste_type`,
             ])
             .leftJoin(Clients, 'c', 'c.id = s.client_id')
-            .leftJoin(Waste, 'w', 'w.id = c.waste_id')
-            .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
+            // .leftJoin(Waste, 'w', 'w.id = c.waste_id')
+            // .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
             .leftJoin(Driver, 'd', 'd.id = s.driver_id')
             .leftJoin(Transportation, 't', 't.id = s.transportation_id')
             .where('s.deleted_at IS NULL')
@@ -233,6 +234,25 @@ export const getDetailSubmission = async (req, res) => {
             .getRawMany();
 
         report['documents'] = documents;
+
+        let submissionDetails = await connection.createQueryBuilder(SubmissionDetails, 'sd')
+            .select([
+                `sd.id AS id`,
+                `sd.waste_id AS waste_id`,
+                `sd.qty AS qty`,
+                `sd.total AS total`,
+                `w.name AS waste_name`,
+                `w.price_unit AS waste_price_unit`,
+                `wt.id AS waste_type_id`,
+                `wt.name AS waste_type`,
+            ])
+            .leftJoin(Waste, 'w', 'w.id = sd.waste_id')
+            .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
+            .where('sd.deleted_at IS NULL')
+            .andWhere('sd.submission_id = :sid', { sid: report.id })
+            .getRawMany();
+
+        report['submission_details'] = submissionDetails;
 
         response = responseSuccess(200, "Success!", report);
 
@@ -280,7 +300,7 @@ export const createSubmission = async (req, res) => {
         // Create Data
         let data = {
             client_id: body.client_id,
-            waste_cost: body.waste_cost,
+            // waste_cost: body.waste_cost,
             // driver_id: body.driver_id,
             // transportation_id: body.transportation_id,
             // period: body.period,
@@ -297,6 +317,39 @@ export const createSubmission = async (req, res) => {
 
         if (!storeSubmission) {
             throw new Error('Fail to create data.');
+        }
+
+        
+        if (body.waste) {
+            if (body.waste.length > 0) {
+                let submissionDetails = [];
+
+                for (const item of body.waste) {
+                    let wasteDetail = await queryRunner.manager
+                        .findOne(Waste, { id: item.waste_id, deleted_at: null });
+
+                    submissionDetails.push({
+                        submission_id: storeSubmission.id,
+                        waste_id: item.waste_id,
+                        qty: item.qty,
+                        total: (item.qty * wasteDetail.price_unit),
+                        created_at: moment.utc(),
+                        updated_at: moment.utc()
+                    })
+                }
+
+                let storeSubmissionDetails = await queryRunner.manager
+                    .getRepository(SubmissionDetails)
+                    .save(submissionDetails);
+
+                if (!storeSubmissionDetails) {
+                    throw new Error('Fail to create data.');
+                }
+            }else{
+                throw new Error('Waste must be required.');
+            }
+        }else{
+            throw new Error('Waste must be required.');
         }
 
         // MAPPING DRIVER DOCUMENT
