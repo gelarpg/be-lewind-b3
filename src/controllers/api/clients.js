@@ -135,11 +135,11 @@ export const getDetailClients = async (req, res) => {
                 `cw.id AS id`,
                 `cw.client_id AS client_id`,
                 `cw.waste_id AS waste_id`,
+                `cw.waste_cost AS waste_cost`,
                 `w.name AS waste_name`,
                 `wt.id AS waste_type_id`,
                 `wt.name AS waste_type`,
-                `w.weight_unit AS waste_weight_unit`,
-                `w.price_unit AS waste_price_unit`
+                `w.weight_unit AS waste_weight_unit`
             ])
             .leftJoin(Waste, 'w', 'w.id = cw.waste_id')
             .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
@@ -219,7 +219,8 @@ export const createClients = async (req, res) => {
             for (const item of wasteList) {
                 clients_waste.push({
                     client_id: storeClients.id,
-                    waste_id: item,
+                    waste_id: item.id,
+                    waste_cost: item.waste_cost,
                     created_at: moment().utc(),
                     updated_at: moment().utc()
                 });
@@ -322,7 +323,8 @@ export const updateClients = async (req, res) => {
             for (const item of wasteList) {
                 clients_waste.push({
                     client_id: clients.id,
-                    waste_id: item,
+                    waste_id: item.id,
+                    waste_cost: item.waste_cost,
                     created_at: moment().utc(),
                     updated_at: moment().utc()
                 });

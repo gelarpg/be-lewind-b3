@@ -200,15 +200,23 @@ export const getDetailBills = async (req, res) => {
             .select([
                 `sd.id AS id`,
                 `sd.waste_id AS waste_id`,
+                `sd.driver_id AS driver_id`,
+                `sd.transportation_id AS transportation_id`,
+                `sd.period AS period`,
                 `sd.qty AS qty`,
                 `sd.total AS total`,
                 `w.name AS waste_name`,
-                `w.price_unit AS waste_price_unit`,
                 `wt.id AS waste_type_id`,
                 `wt.name AS waste_type`,
+                `d.id AS driver_id`,
+                `d.name AS driver_name`,
+                `t.id AS transportation_id`,
+                `t.name AS transportation_name`,
             ])
             .leftJoin(Waste, 'w', 'w.id = sd.waste_id')
             .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
+            .leftJoin(Driver, 'd', 'd.id = sd.driver_id')
+            .leftJoin(Transportation, 't', 't.id = sd.transportation_id')
             .where('sd.deleted_at IS NULL')
             .andWhere('sd.submission_id = :sid', { sid: report.id })
             .getRawMany();

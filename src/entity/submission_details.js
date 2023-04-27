@@ -21,6 +21,23 @@ const SubmissionDetails = new EntitySchema({
             nullable: true,
             Index
         },
+        driver_id: {
+            type: "integer",
+            default: null,
+            nullable: true,
+            Index
+        },
+        transportation_id: {
+            type: "integer",
+            default: null,
+            nullable: true,
+            Index
+        },
+        period: {
+            type: "date",
+            default: null,
+            nullable: true
+        },
         qty: {
             type: "integer",
             Index

@@ -15,6 +15,7 @@ import fs from 'fs';
 import WasteType from "../../entity/waste_type";
 import { calculateDashboardInput } from "./dashboard";
 import SubmissionDetails from "../../entity/submission_details";
+import ClientsWaste from "../../entity/clients_waste";
 
 export const getListSubmissionStatus = async (req, res) => {
     // RESPONSE
@@ -187,16 +188,16 @@ export const getDetailSubmission = async (req, res) => {
                 `s.service_fee AS service_fee`,
                 `s.travel_fee_status AS travel_fee`,
                 `s.status AS status`,
-                `s.waste_cost AS waste_cost`,
+                // `s.waste_cost AS waste_cost`,
                 `s.created_at AS created_at`,
                 `s.updated_at AS updated_at`,
                 `c.id AS client_id`,
                 `c.name AS client_name`,
                 `c.address AS client_address`,
-                `d.id AS driver_id`,
-                `d.name AS driver_name`,
-                `t.id AS transportation_id`,
-                `t.name AS transportation_name`,
+                // `d.id AS driver_id`,
+                // `d.name AS driver_name`,
+                // `t.id AS transportation_id`,
+                // `t.name AS transportation_name`,
                 // `w.id AS waste_id`,
                 // `w.name AS waste_name`,
                 // `w.price_unit AS waste_price_unit`,
@@ -206,8 +207,8 @@ export const getDetailSubmission = async (req, res) => {
             .leftJoin(Clients, 'c', 'c.id = s.client_id')
             // .leftJoin(Waste, 'w', 'w.id = c.waste_id')
             // .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
-            .leftJoin(Driver, 'd', 'd.id = s.driver_id')
-            .leftJoin(Transportation, 't', 't.id = s.transportation_id')
+            // .leftJoin(Driver, 'd', 'd.id = s.driver_id')
+            // .leftJoin(Transportation, 't', 't.id = s.transportation_id')
             .where('s.deleted_at IS NULL')
             .andWhere('s.id = :id', { id: id })
             .andWhere('s.status = :status', { status: 1 });
@@ -239,15 +240,23 @@ export const getDetailSubmission = async (req, res) => {
             .select([
                 `sd.id AS id`,
                 `sd.waste_id AS waste_id`,
+                `sd.driver_id AS driver_id`,
+                `sd.transportation_id AS transportation_id`,
+                `sd.period AS period`,
                 `sd.qty AS qty`,
                 `sd.total AS total`,
                 `w.name AS waste_name`,
-                `w.price_unit AS waste_price_unit`,
                 `wt.id AS waste_type_id`,
                 `wt.name AS waste_type`,
+                `d.id AS driver_id`,
+                `d.name AS driver_name`,
+                `t.id AS transportation_id`,
+                `t.name AS transportation_name`,
             ])
             .leftJoin(Waste, 'w', 'w.id = sd.waste_id')
             .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
+            .leftJoin(Driver, 'd', 'd.id = sd.driver_id')
+            .leftJoin(Transportation, 't', 't.id = sd.transportation_id')
             .where('sd.deleted_at IS NULL')
             .andWhere('sd.submission_id = :sid', { sid: report.id })
             .getRawMany();
@@ -326,13 +335,16 @@ export const createSubmission = async (req, res) => {
 
                 for (const item of body.waste) {
                     let wasteDetail = await queryRunner.manager
-                        .findOne(Waste, { id: item.waste_id, deleted_at: null });
+                        .findOne(ClientsWaste, { client_id: body.client_id, waste_id: item.waste_id, deleted_at: null });
 
                     submissionDetails.push({
                         submission_id: storeSubmission.id,
                         waste_id: item.waste_id,
+                        driver_id: item.driver_id,
+                        transportation_id: item.transportation_id,
                         qty: item.qty,
-                        total: (item.qty * wasteDetail.price_unit),
+                        period: item.period,
+                        total: (item.qty * wasteDetail.waste_cost),
                         created_at: moment.utc(),
                         updated_at: moment.utc()
                     })

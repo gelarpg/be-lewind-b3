@@ -17,6 +17,11 @@ const ClientsWaste = new EntitySchema({
             type: "integer",
             Index
         },
+        waste_cost: {
+            type: "double precision",
+            nullable: true,
+            default: 0,
+        },
         created_at: {
             type: "timestamp",
             nullable: true,
