@@ -23,7 +23,9 @@ const Waste = new EntitySchema({
             type: "varchar"
         },
         price_unit: {
-            type: "double precision"
+            type: "double precision",
+            default: 0,
+            nullable: true,
         },
         created_at: {
             type: "timestamp",
