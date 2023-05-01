@@ -313,8 +313,8 @@ export const createSubmission = async (req, res) => {
             // driver_id: body.driver_id,
             // transportation_id: body.transportation_id,
             // period: body.period,
-            // service_fee: body.service_fee,
-            // travel_fee_status: body.travel_fee,
+            service_fee: body.service_fee,
+            travel_fee_status: body.travel_fee,
             status: 1,
             created_at: moment.utc(),
             updated_at: moment.utc()
