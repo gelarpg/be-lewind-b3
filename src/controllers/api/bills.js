@@ -10,6 +10,7 @@ import moment from "moment";
 import SubmissionDocuments from "../../entity/submission_documents";
 import WasteType from "../../entity/waste_type";
 import SubmissionDetails from "../../entity/submission_details";
+import ClientsWaste from "../../entity/clients_waste";
 
 export const getListBills = async (req, res) => {
     // RESPONSE
@@ -206,6 +207,7 @@ export const getDetailBills = async (req, res) => {
                 `sd.qty AS qty`,
                 `sd.total AS total`,
                 `w.name AS waste_name`,
+                `cw.waste_cost AS waste_cost`,
                 `wt.id AS waste_type_id`,
                 `wt.name AS waste_type`,
                 `d.id AS driver_id`,
@@ -213,7 +215,9 @@ export const getDetailBills = async (req, res) => {
                 `t.id AS transportation_id`,
                 `t.name AS transportation_name`,
             ])
+            .leftJoin(Submission, 's', 's.id = sd.submission_id')
             .leftJoin(Waste, 'w', 'w.id = sd.waste_id')
+            .leftJoin(ClientsWaste, 'cw', 'cw.client_id = s.client_id AND cw.waste_id = w.id')
             .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
             .leftJoin(Driver, 'd', 'd.id = sd.driver_id')
             .leftJoin(Transportation, 't', 't.id = sd.transportation_id')
