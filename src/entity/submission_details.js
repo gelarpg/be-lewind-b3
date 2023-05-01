@@ -10,7 +10,7 @@ const SubmissionDetails = new EntitySchema({
             Index
         },
         submission_id: {
-            type: "varchar",
+            type: "integer",
             default: null,
             nullable: true,
             Index

@@ -246,6 +246,7 @@ export const getDetailSubmission = async (req, res) => {
                 `sd.qty AS qty`,
                 `sd.total AS total`,
                 `w.name AS waste_name`,
+                `cw.waste_cost AS waste_cost`,
                 `wt.id AS waste_type_id`,
                 `wt.name AS waste_type`,
                 `d.id AS driver_id`,
@@ -253,7 +254,9 @@ export const getDetailSubmission = async (req, res) => {
                 `t.id AS transportation_id`,
                 `t.name AS transportation_name`,
             ])
+            .leftJoin(Submission, 's', 's.id = sd.submission_id')
             .leftJoin(Waste, 'w', 'w.id = sd.waste_id')
+            .leftJoin(ClientsWaste, 'cw', 'cw.client_id = s.client_id AND cw.waste_id = w.id')
             .leftJoin(WasteType, 'wt', 'wt.id = w.waste_type_id')
             .leftJoin(Driver, 'd', 'd.id = sd.driver_id')
             .leftJoin(Transportation, 't', 't.id = sd.transportation_id')
@@ -592,7 +595,7 @@ export const updateSubmission = async (req, res) => {
             dataUpdated.service_fee = body.service_fee;
         }
 
-        if (body.travel_fee_status) {
+        if (body.travel_fee) {
             dataUpdated.travel_fee_status = body.travel_fee;
         }
 
