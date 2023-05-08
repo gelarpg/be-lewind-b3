@@ -210,6 +210,7 @@ export const getDetailBills = async (req, res) => {
                 `sd.total AS total`,
                 `sd.transfer_amount AS transfer_amount`,
                 `sd.transport_target AS transport_target`,
+                `sd.doc_number AS doc_number`,
                 `w.name AS waste_name`,
                 `w.waste_code AS waste_code`,
                 `w.weight_unit AS waste_weight_unit`,

@@ -57,6 +57,16 @@ const SubmissionDetails = new EntitySchema({
             default: null,
             nullable: true
         },
+        invoice_status: {
+            type: "boolean",
+            default: false,
+            nullable: true
+        },
+        doc_number: {
+            type: "varchar",
+            default: null,
+            nullable: true
+        },
         created_at: {
             type: "timestamp",
             nullable: true,

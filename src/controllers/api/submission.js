@@ -249,6 +249,7 @@ export const getDetailSubmission = async (req, res) => {
                 `sd.total AS total`,
                 `sd.transfer_amount AS transfer_amount`,
                 `sd.transport_target AS transport_target`,
+                `sd.doc_number AS doc_number`,
                 `w.name AS waste_name`,
                 `w.waste_code AS waste_code`,
                 `w.weight_unit AS waste_weight_unit`,
@@ -342,6 +343,43 @@ export const createSubmission = async (req, res) => {
             if (body.waste.length > 0) {
                 let submissionDetails = [];
 
+                let docNumbers = [];
+                let duplicateDocs = [];
+                
+                for (const item of body.waste) {
+                    let exist = docNumbers.find(e => e == item.doc_number);
+                    if (exist) {
+                        duplicateDocs.push(item.doc_number);
+                    }else{
+                        docNumbers.push(item.doc_number);
+                    }
+                }
+
+                if (duplicateDocs.length > 0) {
+                    statusCode = 400;
+                    throw new Error(`Terdapat nomor dokumen yang sama : ${duplicateDocs.join(',')}.`);
+                }
+
+                let checkDocs = await connection.createQueryBuilder(SubmissionDetails, 'sd')
+                    .select([
+                        `sd.id AS id`,
+                        `sd.doc_number AS doc_number`,
+                    ])
+                    .where('deleted_at IS NULL')
+                    .andWhere('sd.doc_number IN (:...docNumber)', {
+                        docNumber: docNumbers
+                    })
+                    .getRawMany();
+
+                if (checkDocs.length > 0) {
+                    let existingDocs = checkDocs.map((e) => {
+                        return e.doc_number;
+                    });
+
+                    statusCode = 400;
+                    throw new Error(`Nomor Dokumen ${existingDocs.join(',')} sudah tersedia.`);
+                }
+
                 for (const item of body.waste) {
                     let wasteDetail = await queryRunner.manager
                         .findOne(ClientsWaste, { client_id: body.client_id, waste_id: item.waste_id, deleted_at: null });
@@ -356,6 +394,7 @@ export const createSubmission = async (req, res) => {
                         total: (item.qty * wasteDetail.waste_cost),
                         transfer_amount: item.transfer_amount,
                         transport_target: item.transport_target,
+                        doc_number: item.doc_number,
                         created_at: moment.utc(),
                         updated_at: moment.utc()
                     })
