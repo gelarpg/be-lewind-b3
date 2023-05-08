@@ -81,6 +81,7 @@ export const getListWaste = async (req, res) => {
             .select([
                 `w.id AS id`,
                 `w.name AS name`,
+                `w.waste_code AS waste_code`,
                 `w.weight_unit AS weight_unit`,
                 `w.price_unit AS price_unit`,
                 `w.created_at AS created_at`,
@@ -157,6 +158,7 @@ export const getDetailWaste = async (req, res) => {
             .select([
                 `w.id AS id`,
                 `w.name AS name`,
+                `w.waste_code AS waste_code`,
                 `w.weight_unit AS weight_unit`,
                 `w.price_unit AS price_unit`,
                 `w.created_at AS created_at`,
@@ -216,12 +218,21 @@ export const createWaste = async (req, res) => {
             throw new Error(errors[0].msg)
         }
 
+        let checkCode = await queryRunner.manager
+            .findOne(Waste, { waste_code: req.body.code, deleted_at: null });
+
+        if (checkCode) {
+            statusCode = 400;
+            throw new Error("Kode limbah sudah tersedia.");
+        }
+
         // Request Body
         let { body } = req;
 
         // Create Data
         let data = {
             name: body.name,
+            waste_code: body.code,
             waste_type_id: body.type,
             weight_unit: body.weight_unit,
             price_unit: body.price_unit,
@@ -288,6 +299,14 @@ export const updateWaste = async (req, res) => {
             throw new Error(errors[0].msg)
         }
 
+        let checkCode = await queryRunner.manager
+            .findOne(Waste, { waste_code: req.body.code, deleted_at: null });
+
+        if (checkCode) {
+            statusCode = 400;
+            throw new Error("Kode limbah sudah tersedia.");
+        }
+
         // Request Body
         let { body, params } = req;
 
@@ -304,6 +323,7 @@ export const updateWaste = async (req, res) => {
         let dataUpdated = {
             ...waste,
             name: body.name,
+            waste_code: body.code,
             waste_type_id: body.type,
             weight_unit: body.weight_unit,
             price_unit: body.price_unit,

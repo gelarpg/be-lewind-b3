@@ -23,7 +23,7 @@ export const login = async (req, res) => {
 
         // Request Body
         let {
-            email,
+            username,
             password,
             remember
         } = req.body;
@@ -33,6 +33,7 @@ export const login = async (req, res) => {
             .select([
                 `u.id AS id`,
                 `u.email AS email`,
+                `u.username AS username`,
                 `u.password AS password`,
                 `u.first_name AS first_name`,
                 `u.last_name AS last_name`,
@@ -41,25 +42,25 @@ export const login = async (req, res) => {
                 `u.updated_at AS updated_at`
             ])
             .leftJoinAndSelect('u.roles', 'roles')
-            .where('u.email = :email', { email: email })
+            .where('(u.email = :username OR u.username = :username)', { username: username })
             .andWhere('u.deleted_at IS NULL')
             .getRawOne();
 
         if (!user) {
             statusCode = 400;
-            throw new Error("Email atau password anda salah !")
+            throw new Error("Username atau password anda salah !")
         }
 
         if (!await bcrypt.compare(password, user.password)) {
             statusCode = 400;
-            throw new Error("Email atau password anda salah !")
+            throw new Error("Username atau password anda salah !")
         }
 
         // Create token
         const jwtBody = {
             user_id: user.id,
             role: user.roles_slug,
-            email
+            username,
         }
         const token = jwt.sign(jwtBody, process.env.TOKEN_KEY, {
             expiresIn: remember ? "1d" : "2h",

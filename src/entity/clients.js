@@ -11,6 +11,8 @@ const Clients = new EntitySchema({
         },
         name: {
             type: "varchar",
+            default: null,
+            nullable: true,
             Index
         },
         company_name: {

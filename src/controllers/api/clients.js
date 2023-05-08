@@ -36,7 +36,7 @@ export const getListClients = async (req, res) => {
         let query = connection.createQueryBuilder(Clients, 'c')
             .select([
                 `c.id AS id`,
-                `c.name AS name`,
+                // `c.name AS name`,
                 `c.company_name AS company_name`,
                 `c.address AS address`,
                 `c.offer_number AS offer_number`,
@@ -111,7 +111,7 @@ export const getDetailClients = async (req, res) => {
         let query = connection.createQueryBuilder(Clients, 'c')
             .select([
                 `c.id AS id`,
-                `c.name AS name`,
+                // `c.name AS name`,
                 `c.company_name AS company_name`,
                 `c.address AS address`,
                 `c.offer_number AS offer_number`,
@@ -137,6 +137,7 @@ export const getDetailClients = async (req, res) => {
                 `cw.waste_id AS waste_id`,
                 `cw.waste_cost AS waste_cost`,
                 `w.name AS waste_name`,
+                `w.waste_code AS waste_code`,
                 `wt.id AS waste_type_id`,
                 `wt.name AS waste_type`,
                 `w.weight_unit AS waste_weight_unit`
@@ -194,7 +195,7 @@ export const createClients = async (req, res) => {
 
         // Create Data
         let data = {
-            name: body.name,
+            // name: body.name,
             company_name: body.company_name,
             // waste_id: body.waste_id,
             address: body.address,
@@ -301,7 +302,7 @@ export const updateClients = async (req, res) => {
         // Create Data
         let dataUpdated = {
             ...clients,
-            name: body.name,
+            // name: body.name,
             company_name: body.company_name,
             waste_id: body.waste_id,
             address: body.address,

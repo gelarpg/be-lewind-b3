@@ -17,6 +17,11 @@ const Users = new EntitySchema({
             type: "varchar",
             length: 50,
         },
+        username: {
+            type: "varchar",
+            length: 50,
+            nullable: true
+        },
         email: {
             type: "varchar",
             length: 50,

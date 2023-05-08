@@ -2,8 +2,7 @@ import { check } from 'express-validator';
 
 export const loginValidation = () => {
     return [
-        check('email', 'Email harus diisi').notEmpty(),
-        check('email', 'Format email tidak sesuai').isEmail(),
+        check('username', 'Username harus diisi').notEmpty(),
 
         check('password', 'Kata sandi harus diisi').notEmpty(),
         check('password', 'Kata sandi Anda harus setidaknya 10 karakter serta mengandung setidaknya satu huruf besar, satu huruf kecil, satu angka, dan satu karakter khusus.')

@@ -15,6 +15,13 @@ const Waste = new EntitySchema({
             default: null,
             Index
         },
+        waste_code: {
+            type: "varchar",
+            default: null,
+            nullable: true,
+            length: 10,
+            Index
+        },
         name: {
             type: "varchar",
             Index

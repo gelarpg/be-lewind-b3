@@ -184,21 +184,21 @@ export const getDetailTransportation = async (req, res) => {
             throw new Error("Data tidak ditemukan.");
         }
 
-        let documents = await connection.createQueryBuilder(TransportationDocuments, 'td')
-            .select([
-                `td.id AS id`,
-                `td.type AS type`,
-                `td.path AS path`,
-                `td.doc_number AS doc_number`,
-                `td.validity_period AS validity_period`,
-                `td.created_at AS created_at`,
-                `td.updated_at AS updated_at`
-            ])
-            .where('td.deleted_at IS NULL')
-            .andWhere('td.transportation_id = :tid', { tid: report.id })
-            .getRawMany();
+        // let documents = await connection.createQueryBuilder(TransportationDocuments, 'td')
+        //     .select([
+        //         `td.id AS id`,
+        //         `td.type AS type`,
+        //         `td.path AS path`,
+        //         `td.doc_number AS doc_number`,
+        //         `td.validity_period AS validity_period`,
+        //         `td.created_at AS created_at`,
+        //         `td.updated_at AS updated_at`
+        //     ])
+        //     .where('td.deleted_at IS NULL')
+        //     .andWhere('td.transportation_id = :tid', { tid: report.id })
+        //     .getRawMany();
 
-        report['documents'] = documents;
+        // report['documents'] = documents;
 
         response = responseSuccess(200, "Success!", report);
 
@@ -265,11 +265,11 @@ export const createTransportation = async (req, res) => {
         }
 
         // MAPPING TRANSPORTATION DOCUMENT
-        let transaportation_documents = [];
-        let directory = `public/api/upload/attachments/transportation/${storeTransportation.id}`;
-        let directoryResult = `/api/upload/attachments/transportation/${storeTransportation.id}`;
+        // let transaportation_documents = [];
+        // let directory = `public/api/upload/attachments/transportation/${storeTransportation.id}`;
+        // let directoryResult = `/api/upload/attachments/transportation/${storeTransportation.id}`;
 
-        checkAndCreateDirectory(directory);
+        // checkAndCreateDirectory(directory);
 
         // // STNK
         // let stnk_file = body.stnk_file;
@@ -287,26 +287,26 @@ export const createTransportation = async (req, res) => {
         // });
 
         // Travel Document
-        let travel_document_file = body.travel_document_file;
-        let travel_document_file_name = travel_document_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        fs.renameSync('./tmp/' + travel_document_file, directory + '/' + travel_document_file_name);
+        // let travel_document_file = body.travel_document_file;
+        // let travel_document_file_name = travel_document_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        // fs.renameSync('./tmp/' + travel_document_file, directory + '/' + travel_document_file_name);
 
-        transaportation_documents.push({
-            transportation_id: storeTransportation.id,
-            type: 'travel_document',
-            doc_number: body.travel_document_number,
-            path: directoryResult + '/' + travel_document_file_name,
-            created_at: moment(),
-            updated_at: moment()
-        });
+        // transaportation_documents.push({
+        //     transportation_id: storeTransportation.id,
+        //     type: 'travel_document',
+        //     doc_number: body.travel_document_number,
+        //     path: directoryResult + '/' + travel_document_file_name,
+        //     created_at: moment(),
+        //     updated_at: moment()
+        // });
 
-        let storeTransportationDocuments = await queryRunner.manager
-            .getRepository(TransportationDocuments)
-            .save(transaportation_documents);
+        // let storeTransportationDocuments = await queryRunner.manager
+        //     .getRepository(TransportationDocuments)
+        //     .save(transaportation_documents);
 
-        if (!storeTransportationDocuments) {
-            throw new Error('Fail to create data.');
-        }
+        // if (!storeTransportationDocuments) {
+        //     throw new Error('Fail to create data.');
+        // }
 
 
         // COMMIT TRANSACTION
@@ -391,12 +391,12 @@ export const updateTransportation = async (req, res) => {
         }
 
         // MAPPING TRANSPORTATION DOCUMENT
-        let transaportation_documents = [];
-        let updated_docs = [];
-        let directory = `public/api/upload/attachments/transportation/${transportation.id}`;
-        let directoryResult = `/api/upload/attachments/transportation/${transportation.id}`;
+        // let transaportation_documents = [];
+        // let updated_docs = [];
+        // let directory = `public/api/upload/attachments/transportation/${transportation.id}`;
+        // let directoryResult = `/api/upload/attachments/transportation/${transportation.id}`;
 
-        checkAndCreateDirectory(directory);
+        // checkAndCreateDirectory(directory);
 
         // // STNK
         // if (body.stnk_file || body.stnk_number || body.stnk_validity_period) {
@@ -430,56 +430,56 @@ export const updateTransportation = async (req, res) => {
         // }
 
         // Travel Document
-        if (body.travel_document_file || body.travel_document_number) {
-            let travel_document_file_name = null;
-            if (body.travel_document_file) {
-                if (fs.existsSync('./tmp/' + body.travel_document_file)) {
-                    let travel_document_file = body.travel_document_file;
-                    travel_document_file_name = travel_document_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-                    fs.renameSync('./tmp/' + travel_document_file, directory + '/' + travel_document_file_name);
-                } else {
-                    statusCode = 400;
-                    throw new Error(`File dengan nama ${body.travel_document_file} tidak tersedia.`);
-                }
-            }
+        // if (body.travel_document_file || body.travel_document_number) {
+        //     let travel_document_file_name = null;
+        //     if (body.travel_document_file) {
+        //         if (fs.existsSync('./tmp/' + body.travel_document_file)) {
+        //             let travel_document_file = body.travel_document_file;
+        //             travel_document_file_name = travel_document_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        //             fs.renameSync('./tmp/' + travel_document_file, directory + '/' + travel_document_file_name);
+        //         } else {
+        //             statusCode = 400;
+        //             throw new Error(`File dengan nama ${body.travel_document_file} tidak tersedia.`);
+        //         }
+        //     }
 
-            // Get Existing Data
-            let transportationDocsTDocs = await queryRunner.manager
-                .findOne(TransportationDocuments, { transportation_id: transportation.id, deleted_at: null, type: 'travel_document' });
+        //     // Get Existing Data
+        //     let transportationDocsTDocs = await queryRunner.manager
+        //         .findOne(TransportationDocuments, { transportation_id: transportation.id, deleted_at: null, type: 'travel_document' });
 
-            transaportation_documents.push({
-                transportation_id: transportation.id,
-                type: 'travel_document',
-                doc_number: body.travel_document_number ? body.travel_document_number : transportationDocsTDocs.doc_number,
-                path: travel_document_file_name ? directoryResult + '/' + travel_document_file_name : transportationDocsTDocs.path,
-                created_at: moment(),
-                updated_at: moment()
-            });
+        //     transaportation_documents.push({
+        //         transportation_id: transportation.id,
+        //         type: 'travel_document',
+        //         doc_number: body.travel_document_number ? body.travel_document_number : transportationDocsTDocs.doc_number,
+        //         path: travel_document_file_name ? directoryResult + '/' + travel_document_file_name : transportationDocsTDocs.path,
+        //         created_at: moment(),
+        //         updated_at: moment()
+        //     });
 
-            updated_docs.push('travel_document');
-        }
+        //     updated_docs.push('travel_document');
+        // }
 
-        if (transaportation_documents.length > 0) {
-            let dropExistingDocs = await queryRunner.manager
-                .createQueryBuilder()
-                .delete()
-                .from(TransportationDocuments)
-                .where('transportation_id = :id', { id: transportation.id })
-                .andWhere('type IN (:...type)', { type: updated_docs })
-                .execute();
+        // if (transaportation_documents.length > 0) {
+        //     let dropExistingDocs = await queryRunner.manager
+        //         .createQueryBuilder()
+        //         .delete()
+        //         .from(TransportationDocuments)
+        //         .where('transportation_id = :id', { id: transportation.id })
+        //         .andWhere('type IN (:...type)', { type: updated_docs })
+        //         .execute();
 
-            if (!dropExistingDocs) {
-                throw new Error('Fail to update data.');
-            }
+        //     if (!dropExistingDocs) {
+        //         throw new Error('Fail to update data.');
+        //     }
 
-            let transportationDocuments = await queryRunner.manager
-                .getRepository(TransportationDocuments)
-                .save(transaportation_documents);
+        //     let transportationDocuments = await queryRunner.manager
+        //         .getRepository(TransportationDocuments)
+        //         .save(transaportation_documents);
 
-            if (!transportationDocuments) {
-                throw new Error('Fail to update data.');
-            }
-        }
+        //     if (!transportationDocuments) {
+        //         throw new Error('Fail to update data.');
+        //     }
+        // }
 
         // COMMIT TRANSACTION
         await queryRunner.commitTransaction();
@@ -540,9 +540,9 @@ export const deleteTransportation = async (req, res) => {
             throw new Error('Data tidak ditemukan.');
         }
 
-        await connection.update(TransportationDocuments, { transportation_id: params.id, deleted_at: null }, {
-            deleted_at: moment()
-        });
+        // await connection.update(TransportationDocuments, { transportation_id: params.id, deleted_at: null }, {
+        //     deleted_at: moment()
+        // });
 
         await connection.update(TransportationLicense, { transportation_id: params.id, deleted_at: null }, {
             deleted_at: moment()

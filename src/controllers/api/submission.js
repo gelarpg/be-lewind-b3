@@ -101,6 +101,7 @@ export const getListSubmission = async (req, res) => {
                 `s.created_at AS created_at`,
                 `s.updated_at AS updated_at`,
                 `c.name AS client_name`,
+                `c.company_name AS client_company_name`,
                 `d.name AS driver_name`,
                 `t.name AS transportation_name`,
                 // `w.name AS waste_name`,
@@ -193,6 +194,7 @@ export const getDetailSubmission = async (req, res) => {
                 `s.updated_at AS updated_at`,
                 `c.id AS client_id`,
                 `c.name AS client_name`,
+                `c.company_name AS client_company_name`,
                 `c.address AS client_address`,
                 // `d.id AS driver_id`,
                 // `d.name AS driver_name`,
@@ -245,7 +247,11 @@ export const getDetailSubmission = async (req, res) => {
                 `sd.period AS period`,
                 `sd.qty AS qty`,
                 `sd.total AS total`,
+                `sd.transfer_amount AS transfer_amount`,
+                `sd.transport_target AS transport_target`,
                 `w.name AS waste_name`,
+                `w.waste_code AS waste_code`,
+                `w.weight_unit AS waste_weight_unit`,
                 `cw.waste_cost AS waste_cost`,
                 `wt.id AS waste_type_id`,
                 `wt.name AS waste_type`,
@@ -348,6 +354,8 @@ export const createSubmission = async (req, res) => {
                         qty: item.qty,
                         period: item.period,
                         total: (item.qty * wasteDetail.waste_cost),
+                        transfer_amount: item.transfer_amount,
+                        transport_target: item.transport_target,
                         created_at: moment.utc(),
                         updated_at: moment.utc()
                     })
@@ -391,36 +399,36 @@ export const createSubmission = async (req, res) => {
         }
 
         // Invoice
-        if (body.invoice_file) {
-            let invoice_file = body.invoice_file;
-            let invoice_file_name = invoice_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-            fs.renameSync('./tmp/' + invoice_file, directory + '/' + invoice_file_name);
+        // if (body.invoice_file) {
+        //     let invoice_file = body.invoice_file;
+        //     let invoice_file_name = invoice_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        //     fs.renameSync('./tmp/' + invoice_file, directory + '/' + invoice_file_name);
 
-            submission_documents.push({
-                submission_id: storeSubmission.id,
-                type: 'invoice',
-                doc_number: '-',
-                path: directoryResult + '/' + invoice_file_name,
-                created_at: moment(),
-                updated_at: moment()
-            });
-        }
+        //     submission_documents.push({
+        //         submission_id: storeSubmission.id,
+        //         type: 'invoice',
+        //         doc_number: '-',
+        //         path: directoryResult + '/' + invoice_file_name,
+        //         created_at: moment(),
+        //         updated_at: moment()
+        //     });
+        // }
 
         // Provider
-        if (body.provider_file) {
-            let provider_file = body.provider_file;
-            let provider_file_name = provider_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-            fs.renameSync('./tmp/' + provider_file, directory + '/' + provider_file_name);
+        // if (body.provider_file) {
+        //     let provider_file = body.provider_file;
+        //     let provider_file_name = provider_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        //     fs.renameSync('./tmp/' + provider_file, directory + '/' + provider_file_name);
 
-            submission_documents.push({
-                submission_id: storeSubmission.id,
-                type: 'provider',
-                doc_number: '-',
-                path: directoryResult + '/' + provider_file_name,
-                created_at: moment(),
-                updated_at: moment()
-            });
-        }
+        //     submission_documents.push({
+        //         submission_id: storeSubmission.id,
+        //         type: 'provider',
+        //         doc_number: '-',
+        //         path: directoryResult + '/' + provider_file_name,
+        //         created_at: moment(),
+        //         updated_at: moment()
+        //     });
+        // }
 
         // Transporter
         if (body.transporter_file) {
@@ -637,50 +645,50 @@ export const updateSubmission = async (req, res) => {
         }
 
         // Invoice
-        if (body.invoice_file) {
-            if (fs.existsSync('./tmp/' + body.invoice_file)) {
-                let invoice_file = body.invoice_file;
-                let invoice_file_name = invoice_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-                fs.renameSync('./tmp/' + invoice_file, directory + '/' + invoice_file_name);
+        // if (body.invoice_file) {
+        //     if (fs.existsSync('./tmp/' + body.invoice_file)) {
+        //         let invoice_file = body.invoice_file;
+        //         let invoice_file_name = invoice_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        //         fs.renameSync('./tmp/' + invoice_file, directory + '/' + invoice_file_name);
 
-                submission_documents.push({
-                    submission_id: submission.id,
-                    type: 'invoice',
-                    doc_number: '-',
-                    path: directoryResult + '/' + invoice_file_name,
-                    created_at: moment(),
-                    updated_at: moment()
-                });
+        //         submission_documents.push({
+        //             submission_id: submission.id,
+        //             type: 'invoice',
+        //             doc_number: '-',
+        //             path: directoryResult + '/' + invoice_file_name,
+        //             created_at: moment(),
+        //             updated_at: moment()
+        //         });
 
-                updated_docs.push('invoice');
-            } else {
-                statusCode = 400;
-                throw new Error(`File dengan nama ${body.invoice_file} tidak tersedia.`);
-            }
-        }
+        //         updated_docs.push('invoice');
+        //     } else {
+        //         statusCode = 400;
+        //         throw new Error(`File dengan nama ${body.invoice_file} tidak tersedia.`);
+        //     }
+        // }
 
-        // Provider
-        if (body.provider_file) {
-            if (fs.existsSync('./tmp/' + body.provider_file)) {
-                let provider_file = body.provider_file;
-                let provider_file_name = provider_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-                fs.renameSync('./tmp/' + provider_file, directory + '/' + provider_file_name);
+        // // Provider
+        // if (body.provider_file) {
+        //     if (fs.existsSync('./tmp/' + body.provider_file)) {
+        //         let provider_file = body.provider_file;
+        //         let provider_file_name = provider_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        //         fs.renameSync('./tmp/' + provider_file, directory + '/' + provider_file_name);
 
-                submission_documents.push({
-                    submission_id: submission.id,
-                    type: 'provider',
-                    doc_number: '-',
-                    path: directoryResult + '/' + provider_file_name,
-                    created_at: moment(),
-                    updated_at: moment()
-                });
+        //         submission_documents.push({
+        //             submission_id: submission.id,
+        //             type: 'provider',
+        //             doc_number: '-',
+        //             path: directoryResult + '/' + provider_file_name,
+        //             created_at: moment(),
+        //             updated_at: moment()
+        //         });
 
-                updated_docs.push('provider');
-            } else {
-                statusCode = 400;
-                throw new Error(`File dengan nama ${body.provider_file} tidak tersedia.`);
-            }
-        }
+        //         updated_docs.push('provider');
+        //     } else {
+        //         statusCode = 400;
+        //         throw new Error(`File dengan nama ${body.provider_file} tidak tersedia.`);
+        //     }
+        // }
 
         // Transporter
         if (body.transporter_file) {
