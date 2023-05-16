@@ -61,6 +61,11 @@ const Submission = new EntitySchema({
             default: false,
             nullable: true
         },
+        transfer_amount: {
+            type: "double precision",
+            default: 0,
+            nullable: true
+        },
         created_at: {
             type: "timestamp",
             nullable: true,

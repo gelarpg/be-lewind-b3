@@ -47,11 +47,6 @@ const SubmissionDetails = new EntitySchema({
             default: null,
             nullable: true
         },
-        transfer_amount: {
-            type: "double precision",
-            default: 0,
-            nullable: true
-        },
         transport_target: {
             type: "text",
             default: null,

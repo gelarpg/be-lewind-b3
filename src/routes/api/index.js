@@ -12,6 +12,7 @@ import submissionRoute from './submission';
 import ordersRoute from './orders';
 import billsRoute from './bills';
 import dashboardRoute from './dashboard';
+import dailyCountRoute from './daily_count';
 import verifyToken from '../../middleware/authenticate';
 import { uploadFile } from '../../controllers/api/attachment';
 import upload from '../../middleware/attachment';
@@ -35,5 +36,6 @@ router.use('/clients', [verifyToken], clientsRoute);
 router.use('/submission', [verifyToken], submissionRoute);
 router.use('/orders', [verifyToken], ordersRoute);
 router.use('/bills', [verifyToken], billsRoute);
+router.use('/daily-count', [verifyToken], dailyCountRoute);
 
 module.exports = router;
