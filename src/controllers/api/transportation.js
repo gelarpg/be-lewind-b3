@@ -1,7 +1,7 @@
 import { getConnection, getManager } from "typeorm";
 import { responseError, responseSuccess } from "../../utils/response";
 import { validate } from '../../middleware/validator';
-import moment from "moment";
+import moment from "moment-timezone";
 import TransportationType from "../../entity/transportation_type";
 import Transportation from "../../entity/transportation";
 import TransportationDocuments from "../../entity/transportation_documents";
@@ -242,6 +242,20 @@ export const createTransportation = async (req, res) => {
 
         // Request Body
         let { body } = req;
+
+        let validateNoPolice = await connection.createQueryBuilder(Transportation, 't')
+            .select([
+                `t.id AS id`,
+                `t.no_police AS no_police`,
+            ])
+            .where('t.deleted_at IS NULL')
+            .andWhere('t.no_police = :no_police', { no_police: body.no_police })
+            .getRawOne();
+
+        if (validateNoPolice) {
+            statusCode = 400;
+            throw new Error(`Transportasi dengan nomor polisi ${body.no_police} sudah tersedia.`)
+        }
 
         // Create Data
         let data = {

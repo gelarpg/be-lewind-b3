@@ -6,7 +6,7 @@ import Waste from "../../entity/waste";
 import Driver from "../../entity/driver";
 import Clients from "../../entity/clients";
 import SubmissionStatus from "../../entity/submission_status";
-import moment from "moment";
+import moment from "moment-timezone";
 import SubmissionDocuments from "../../entity/submission_documents";
 import WasteType from "../../entity/waste_type";
 import SubmissionDetails from "../../entity/submission_details";

@@ -4,7 +4,7 @@ import Users from "../../entity/users";
 import { responseError, responseSuccess } from "../../utils/response";
 import { validate } from '../../middleware/validator';
 import Roles from "../../entity/roles";
-import moment from "moment";
+import moment from "moment-timezone";
 
 export const getListUsers = async (req, res) => {
     // RESPONSE

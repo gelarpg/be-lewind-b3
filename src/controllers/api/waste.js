@@ -3,7 +3,7 @@ import { getConnection, getManager, getRepository } from "typeorm";
 import Waste from "../../entity/waste";
 import { responseError, responseSuccess } from "../../utils/response";
 import { validate } from '../../middleware/validator';
-import moment from "moment";
+import moment from "moment-timezone";
 import WasteType from "../../entity/waste_type";
 
 export const getListWasteType = async (req, res) => {

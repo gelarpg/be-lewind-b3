@@ -1,4 +1,4 @@
-import moment from "moment";
+import moment from "moment-timezone";
 import { getRepository, getManager, Not, getConnection } from "typeorm";
 import DashboardOrders from "../../entity/dashboard_orders";
 import Submission from "../../entity/submission";

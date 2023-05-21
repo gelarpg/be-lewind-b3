@@ -3,7 +3,7 @@ import { getConnection, getManager, getRepository } from "typeorm";
 import Driver from "../../entity/driver";
 import { responseError, responseSuccess } from "../../utils/response";
 import { validate } from '../../middleware/validator';
-import moment from "moment";
+import moment from "moment-timezone";
 import DriverDocuments from "../../entity/driver_documents";
 import fs from 'fs';
 import { checkAndCreateDirectory } from "../../middleware/helper";

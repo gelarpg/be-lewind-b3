@@ -34,7 +34,7 @@ const SubmissionDetails = new EntitySchema({
             Index
         },
         period: {
-            type: "date",
+            type: "timestamp",
             default: null,
             nullable: true
         },
@@ -76,7 +76,7 @@ const SubmissionDetails = new EntitySchema({
             type: "timestamp",
             nullable: true,
             default: null,
-        },
+        }
     }
 });
 

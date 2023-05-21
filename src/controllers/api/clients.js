@@ -3,7 +3,7 @@ import { getConnection, getManager, getRepository } from "typeorm";
 import Clients from "../../entity/clients";
 import { responseError, responseSuccess } from "../../utils/response";
 import { validate } from '../../middleware/validator';
-import moment from "moment";
+import moment from "moment-timezone";
 import Waste from "../../entity/waste";
 import WasteType from "../../entity/waste_type";
 import ClientsWaste from "../../entity/clients_waste";

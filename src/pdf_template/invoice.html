@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoice</title>
+  <style>
+    @media print {
+      .pagebreak {
+        clear: both;
+        page-break-after: always;
+      }
+      body {
+        font-family: Arial;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="pdf-viewer" style="padding: 20px">
+    <div id="header">
+      <table style="width: 100%;">
+        <tr style="vertical-align: middle;">
+          <td>
+            <img src="./images/logo.png" style="margin-right: 15px; width: 70px; height: 70px; float: left" />
+            <div>
+              <p style="font-size: 14px; font-weight: bold; margin: 0">
+                PT. LEWIND
+              </p>
+              <p style="font-size: 10px; font-weight: bold; margin: 0">
+                Penanganan Dan Pengelolaan Limbah Non B3
+              </p>
+              <p style="font-size: 10px; font-weight: bold; margin: 0">
+                Serta Transporter Limbah B3
+              </p>
+              <p style="font-size: 8px; margin: 0">
+                Alamat : Jl. Palem II/TE-23 Pondok Candra Indah, Sidoarjo 61256
+              </p>
+              <p style="font-size: 8px; margin: 0">
+                Telp. : 031-8673833, 031-99681997
+              </p>
+              <p style="font-size: 8px; margin: 0">
+                Email : pt_lewind@yahoo.com, ptlewind@mail.com
+              </p>
+            </div>
+          </td>
+          <td>
+            <img src="./images/ISO-14001-logo.jpeg" style="width: 70px; height: 70px" />
+          </td>
+        </tr>
+      </table>
+      <div style="margin-top: 10px">
+        <div style="border: 0; border-top: 1px solid #000; margin-bottom: 3px"></div>
+        <div style="border: 0; border-top: 3px solid #000; margin: 0"></div>
+      </div>
+    </div>
+    <div id="pdf-body" style="font-size: 10px; margin-top: 20px; margin-left: 40px; margin-right: 40px">
+      <div style="text-align: right; margin-bottom: 20px">
+        Sidoarjo, {{doc_date}}
+      </div>
+      <div id="section-1">
+        <table>
+          <tr>
+            <td style="width: 75px">Nomor</td>
+            <td>:</td>
+            <td>{{doc_number}}</td>
+          </tr>
+          <tr>
+            <td style="width: 75px">Lampiran</td>
+            <td>:</td>
+            <td>1 (Satu) Berkas</td>
+          </tr>
+          <tr>
+            <td style="width: 75px">Perihal</td>
+            <td>:</td>
+            <td>Invoice</td>
+          </tr>
+        </table>
+      </div>
+      <div id="section-2" style="margin-top: 20px; margin-left: 75px">
+        <div>
+          <div style="margin-bottom: 8px">Kepada Yth :</div>
+          <b style="margin-bottom: 8px">{{company_name}}</b>
+          <div style="margin-bottom: 8px">{{company_address}}</div>
+          <!-- <div style="margin-bottom: 8px">Perak Utara, Surabaya</div> -->
+        </div>
+        <div style="margin-top: 10px; margin-bottom: 10px">
+          Dengan Hormat,
+        </div>
+        <div style="text-indent: 50px; margin-bottom: 10px">
+          Bersama ini kami mengajukan permohonan pembayaran Pekerjaan -
+          Pengangkutan Limbah dari {{company_name}} ke
+          Tempat Pemanfaat limbah B3 pada tanggal <b>{{period}}</b>.
+        </div>
+        <div style="text-indent: 50px">
+          Dengan selesainya pekerjaan tersebut dalam invoice No.
+          {{invoice_number}}, sejumlah Rp.
+          <b>{{invoice.price_total}},- ({{invoice.price_total_string}} Rupiah).</b>
+          Maka diharapkan pihak {{company_name}} bisa menyelesaikan
+          pembayaran sesuai kesepakatan sebelumnya.
+        </div>
+        <div style="margin-top: 8px">Pembayaran mohon ditransfer ke :</div>
+        <div id="section-3" style="margin-top: 10px">
+          <table>
+            <tr>
+              <td style="width: 105px; font-weight: bold;">Atas Nama</td>
+              <td style="font-weight: bold;">:</td>
+              <td style="font-weight: bold;">PT. LEWIND</td>
+            </tr>
+            <tr>
+              <td style="width: 105px; font-weight: bold;">AC. No</td>
+              <td style="font-weight: bold;">:</td>
+              <td style="font-weight: bold;">1420086872180</td>
+            </tr>
+            <tr>
+              <td style="width: 105px; font-weight: bold;">Bank</td>
+              <td style="font-weight: bold;">:</td>
+              <td style="font-weight: bold;">Mandiri - Cabang Pondok Candra Sidoarjo</td>
+            </tr>
+          </table>
+        </div>
+        <div id="section-4" style="margin-top: 30px">
+          <div>Hormat Kami,</div>
+          <div style="margin-bottom: 95px">PT. Lewind</div>
+          <div style="
+                font-weight: bold;
+                text-decoration: underline;
+                margin-bottom: 10px;
+              ">
+            Ilma Hidayati
+          </div>
+          <div>Keuangan</div>
+        </div>
+      </div>
+    </div>
+    <div class="pagebreak"> </div>
+    <div id="invoice" class="font-size: 10px;">
+      <div style="margin-bottom: 40px; margin-top: 40px; font-weight: bold; font-size: 14px; text-align: center;">
+        INVOICE
+      </div>
+      <div id="section-5" style="margin-top: 10px; font-size: 10px;">
+        <table>
+          <tr>
+            <td style="width: 105px">No.</td>
+            <td>:</td>
+            <td>{{invoice_number}}</td>
+          </tr>
+          <tr style="vertical-align: top;">
+            <td style="width: 105px">Customer</td>
+            <td>:</td>
+            <td>
+              <div style="font-weight: bold; margin-bottom: 8px;">{{company_name}}</div>
+              <div style="margin-bottom: 8px">{{company_address}}</div>
+              <!-- <div>Perak Utara, Surabaya</div> -->
+            </td>
+          </tr>
+          <tr>
+            <td style="width: 105px">Perihal</td>
+            <td>:</td>
+            <td>
+              Biaya Transportasi Limbah B3
+            </td>
+          </tr>
+          <tr>
+            <td style="width: 105px">Periode</td>
+            <td>:</td>
+            <td>
+              {{period}}
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div id="section-6" style="margin-top: 20px; font-size: 10px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 10px;" border="1">
+          <thead>
+            <th width="5%">No.</th>
+            <th width="35%">Obyek Kerja</th>
+            <th width="15%">Jumlah</th>
+            <th width="10%">Satuan</th>
+            <th width="15%">Harga Satuan</th>
+            <th width="20%">Jumlah Harga</th>
+          </thead>
+          <tbody>
+            {{#each invoice.list}}
+              <tr>
+                <td style="padding: 5px; text-align: center;">{{this.no}}</td>
+                <td style="padding: 5px;">
+                  <div>
+                    <div>Biaya Penanganan Limbah B3 :</div>
+                    <div>{{this.waste_name}}</div>
+                  </div>
+                </td>
+                <td style="padding: 5px; text-align: right;">{{this.waste_qty}}</td>
+                <td style="padding: 5px; text-align: center;">{{this.waste_weight_unit}}</td>
+                <td style="padding: 5px;">Rp {{this.waste_price_by_item}}</td>
+                <td style="padding: 5px;">Rp {{this.waste_price_total}}</td>
+              </tr>
+            {{/each}}
+              
+            <tr>
+              <td style="font-weight: bold; padding: 5px; padding-left: 50px;" colspan="5">Jumlah</td>
+              <td style="padding: 5px;">Rp {{invoice.price_before_ppn}}</td>
+            </tr>
+            <tr>
+              <td style="font-weight: bold; padding: 5px; padding-left: 50px;" colspan="5">PPN 11%</td>
+              <td style="padding: 5px;">Rp {{invoice.price_ppn}}</td>
+            </tr>
+            <tr>
+              <td style="font-weight: bold; padding: 5px; padding-left: 50px;" colspan="5">Total Invoice</td>
+              <td style="font-weight: bold; padding: 5px;">Rp {{invoice.price_total}}</td>
+            </tr>
+            <tr>
+              <td style="font-weight: bold; padding: 20px" colspan="6">
+                Terbilang: {{invoice.price_total_string}} Rupiah
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div style="font-size: 10px; margin-top: 16px; margin-bottom: 32px; font-weight: bold; text-decoration: underline;">
+          Jatuh tempo pembayaran 2 minggu setelah invoice diterima
+        </div>
+        <table style="width: 100%; font-size: 10px;">
+          <tr style="vertical-align: top;">
+            <td>
+              <div style="font-weight: bold;">Pembayaran harap ditransfer ke :</div>
+              <div id="section-3" style="margin-top: 10px">
+                <table>
+                  <tr>
+                    <td style="width: 105px; font-weight: bold;">Atas Nama</td>
+                    <td style="font-weight: bold;">:</td>
+                    <td style="font-weight: bold;">PT. LEWIND</td>
+                  </tr>
+                  <tr>
+                    <td style="width: 105px; font-weight: bold;">AC. No</td>
+                    <td style="font-weight: bold;">:</td>
+                    <td style="font-weight: bold;">1420086872180</td>
+                  </tr>
+                  <tr>
+                    <td style="width: 105px; font-weight: bold;">Bank</td>
+                    <td style="font-weight: bold;">:</td>
+                    <td style="font-weight: bold;">Mandiri - Cabang Pondok Candra Sidoarjo</td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+            <td>
+              <div style="text-align: center;">
+                <div>Sidoarjo, {{doc_date}}</div>
+                <div style="margin-bottom: 64px;">PT. LEWIND</div>
+                <div style="
+                    font-weight: bold;
+                    text-decoration: underline;
+                    margin-bottom: 10px;
+                  ">
+                  Ilma Hidayati
+                </div>
+                <div>Keuangan</div>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="pagebreak"></div>
+    <div id="daily-count">
+      <div style="text-align: center; font-weight: bold; margin-bottom: 40px; margin-top: 40px; font-size: 14px;">
+        DAILY COUNT OF PT. PELINDO MARINE SERVICE
+      </div>
+      <div style="margin-bottom: 8px; font-size: 10px;">Month/Year: October/2022</div>
+      <table style="width: 100%; border-collapse: collapse; font-size: 8px;" border="1">
+        <thead>
+          <th width="5%">No.</th>
+          <th width="10%">Date</th>
+          <th width="10%">Police Number</th>
+          <th width="15%">Driver</th>
+          <th width="15%">Purpose</th>
+          <th width="15%">Waste</th>
+          <th width="10%">Quantity (KG)</th>
+          <th width="15%">No. Manifest</th>
+        </thead>
+        <tbody>
+          {{#each data}}
+            <tr>
+              <td style="padding: 2px; text-align: center;">1</td>
+              <td style="padding: 2px; text-align: center;">{{this.period}}</td>
+              <td style="padding: 2px; text-align: center;">{{this.transportation_no_police}}</td>
+              <td style="padding: 2px; text-align: center;">{{this.driver_name}}</td>
+              <td style="padding: 2px; text-align: center;">{{this.transport_target}}</td>
+              <td style="padding: 2px; text-align: center;">{{this.waste_name}}</td>
+              <td style="padding: 2px; text-align: center;">{{this.qty}}</td>
+              <td style="padding: 2px; text-align: center;">{{this.doc_number}}</td>
+            </tr>
+          {{/each}}
+          <tr>
+            <td></td>
+            <td></td>
+            <td colspan="4" style="font-weight: bold; text-align: center;">TOTAL</td>
+            <td style="font-weight: bold; text-align: center;">{{waste_qty_total}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="float: right; margin-top: {{marginttdpage2}}; font-size: 10px;">
+        <div style="text-align: center;">
+          <div>Sidoarjo, {{doc_date}}</div>
+          <div style="margin-bottom: 64px;">Issued By</div>
+          <div style="margin-bottom: 8px;">
+            ( Nur Endah Mar'atus )
+          </div>
+          <div>Operational Staff</div>
+        </div>
+      </div>
+    </div>
+    <div style="clear: both;"></div>
+    <!-- <div class="pagebreak"></div>
+    <div id="tax">
+      <div style="margin-bottom: 40px; margin-top: 40px; font-weight: bold; font-size: 14px; text-align: center;">FAKTUR PAJAK
+      </div>
+      <table style="width: 100%; border-collapse: collapse; font-size: 10px;" border="1">
+        <tr>
+          <td style="text-align: left; padding: 8px;" colspan="3">Kode dan Nomor Seri Faktur Pajak: -</td>
+        </tr>
+        <tr>
+          <td style="text-align: left; padding: 8px;" colspan="3">Pengusaha Kena Pajak</td>
+        </tr>
+        <tr>
+          <td style="text-align: left; padding: 8px;" colspan="3">
+            <div>
+              <div>Nama: PT LEWIND</div>
+              <div>Alamat: JL. PALEM II/TE-23, PERTOKOAN PONDOK CANDRA INDAH, WADUNGSARI, SIDOARJO</div>
+              <div>NPWP: 01.979.130.0-641.000</div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: left; padding: 8px;" colspan="3">Pembeli Barang Kena Pajak / Penerima Jasa Kena Pajak</td>
+        </tr>
+        <tr>
+          <td style="text-align: left; padding: 8px;" colspan="3">
+            <div>
+              <div>Nama: {{company_name}}</div>
+              <div>Alamat: {{company_address}}</div>
+              <div>NPWP: -</div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center; padding: 8px;">No. </td>
+          <td style="text-align: center; padding: 8px;">Nama Barang Kena Pajak / Jasa Kena Pajak</td>
+          <td style="text-align: center; padding: 8px;">Harga Jual/Penggantian/Uang Muka/Termin</td>
+        </tr>
+        <tr>
+          <td style="text-align: center; padding: 8px;">1</td>
+          <td style="text-align: left; padding: 8px;">Biaya penangan dan transportasi Limbah B3 yang dihasilkan PT. Pelindo Marina Service pada tanggal {{period}}.<br>{{invoice.price_total}} x 1</td>
+          <td style="text-align: right; padding: 8px;">{{invoice.price_total}}</td>
+        </tr>
+        <tr>
+          <td style="text-align: left; padding: 8px;" colspan="2">Harga Jual / Penggantian</td>
+          <td style="text-align: right; padding: 8px;">{{invoice.price_total}}</td>
+        </tr>
+        <tr>
+          <td style="text-align: left; padding: 8px;" colspan="2">Dikurangi Potongan Harga</td>
+          <td style="text-align: right; padding: 8px;">0,00</td>
+        </tr>
+        <tr>
+          <td style="text-align: left; padding: 8px;" colspan="2">Dikurangi Uang Muka</td>
+          <td style="text-align: right; padding: 8px;">0,00</td>
+        </tr>
+        <tr>
+          <td style="text-align: left; padding: 8px;" colspan="2">Dasar Pengenaan Pajak</td>
+          <td style="text-align: right; padding: 8px;">{{invoice.price_total}}</td>
+        </tr>
+        <tr>
+          <td style="text-align: left; padding: 8px;" colspan="2">Total PPN</td>
+          <td style="text-align: right; padding: 8px;">{{invoice.price_ppn}}</td>
+        </tr>
+        <tr>
+          <td style="text-align: left; padding: 8px;" colspan="2">Total PPnBM (Pajak Penjualan Barang Mewah)</td>
+          <td style="text-align: right; padding: 8px;">0,00</td>
+        </tr>
+      </table>
+    </div>
+    <div style="float: right; margin-top: 24px; font-size: 10px;">
+      <div style="text-align: center;">
+        <div style="margin-bottom: 64px;">Sidoarjo, {{doc_date}}</div>
+        <div style="
+            margin-bottom: 64px;
+          ">
+          LEO MARTIN, SE
+        </div>
+      </div>
+    </div> -->
+    <!-- <div style="clear: both;"></div> -->
+  </div>
+  </div>
+</body>
+
+</html>

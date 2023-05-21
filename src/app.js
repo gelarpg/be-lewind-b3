@@ -11,6 +11,9 @@ const cors = require('cors');
 // CRON
 const scheduleFunction = require('./cron');
 const indexRouter = require('./routes/index');
+var moment = require('moment-timezone');
+moment.tz.setDefault("Asia/Jakarta");
+moment.locale("id");
 
 var app = express();
 const config = process.env;
