@@ -195,7 +195,7 @@ export const generateInvoice = async (req, res) => {
             .getRawMany();
 
         // Read HTML Template
-        var html = fs.readFileSync(path.join(__dirname+'../../../pdf_template/invoice.html'), "utf8");
+        var html = fs.readFileSync(path.join(__dirname+'../../../views/pdf_template/invoice.html'), "utf8");
 
         var options = {
             format: "A4",

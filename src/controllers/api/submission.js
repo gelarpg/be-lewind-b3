@@ -187,7 +187,7 @@ export const getDetailSubmission = async (req, res) => {
                 `s.id AS id`,
                 `s.period AS period`,
                 `s.service_fee AS service_fee`,
-                `s.travel_fee_status AS travel_fee`,
+                `s.travel_fee_status`,
                 `s.status AS status`,
                 // `s.waste_cost AS waste_cost`,
                 `s.transfer_amount AS transfer_amount`,
@@ -977,6 +977,16 @@ export const deleteSubmission = async (req, res) => {
         let dataUpdated = {
             ...submission,
             deleted_at: moment.utc()
+        }
+
+        const updateSubmissionDetails = await queryRunner.manager.update(SubmissionDetails, {
+            submission_id: params.id
+        }, {
+            deleted_at: moment()
+        });
+
+        if (!updateSubmissionDetails) {
+            throw new Error('Gagal menghapus data.');
         }
 
         const updateSubmissionStatus = await queryRunner.manager.save(Submission, dataUpdated);
