@@ -6,6 +6,7 @@ import SubmissionStatus from "../../entity/submission_status";
 import Waste from "../../entity/waste";
 import WasteType from "../../entity/waste_type";
 import { responseError, responseSuccess } from "../../utils/response";
+import { createActivityLog } from "./activity_log";
 
 export const getDashbaords = async (req, res) => {
     // RESPONSE
@@ -18,7 +19,8 @@ export const getDashbaords = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -200,6 +202,10 @@ export const getDashbaords = async (req, res) => {
             waste: wasteType
         };
 
+        // Activity Log
+        const messageLog = `Dashboard berhasil diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!", result);
 
         res.status(response.meta.code).send(response);
@@ -211,6 +217,10 @@ export const getDashbaords = async (req, res) => {
             console.log('ERROR: ', error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+
+        // Activity Log
+        const messageLog = `Dashboard gagal diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
 
         res.status(response.meta.code).send(response);
         res.end();

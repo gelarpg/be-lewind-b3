@@ -17,6 +17,7 @@ import ucwords from "ucwords";
 import angkaTerbilangJs from "@develoka/angka-terbilang-js";
 import { checkAndCreateDirectory } from "../../middleware/helper";
 import GeneratedInvoice from "../../entity/generated_invoice";
+import { createActivityLog } from "./activity_log";
 
 export const getListDailyCount = async (req, res) => {
     // RESPONSE
@@ -28,7 +29,8 @@ export const getListDailyCount = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -120,6 +122,10 @@ export const getListDailyCount = async (req, res) => {
             paginator: paginator,
         };
 
+        // Activity Log
+        const messageLog = `Daily count berhasil diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!", result);
 
         res.status(response.meta.code).send(response);
@@ -131,6 +137,11 @@ export const getListDailyCount = async (req, res) => {
             console.log('ERROR: ', error);
             response = responseError(500, 'Internal server error.')
         }
+
+        // Activity Log
+        const messageLog = `Daily count gagal diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }
@@ -146,7 +157,8 @@ export const generateInvoice = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -309,6 +321,10 @@ export const generateInvoice = async (req, res) => {
             path: `${directoryRes}/${fileName}`,
         };
 
+        // Activity Log
+        const messageLog = `Berhasil generate invoice oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!", result);
 
         res.status(response.meta.code).send(response);
@@ -320,6 +336,11 @@ export const generateInvoice = async (req, res) => {
             console.log('ERROR: ', error);
             response = responseError(500, 'Internal server error.')
         }
+
+        // Activity Log
+        const messageLog = `Gagal generate invoice oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }
@@ -335,7 +356,8 @@ export const getListGeneratedInvoice = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -392,6 +414,10 @@ export const getListGeneratedInvoice = async (req, res) => {
             paginator: paginator,
         };
 
+        // Activity Log
+        const messageLog = `Invoice berhasil diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!", result);
 
         res.status(response.meta.code).send(response);
@@ -403,6 +429,11 @@ export const getListGeneratedInvoice = async (req, res) => {
             console.log('ERROR: ', error);
             response = responseError(500, 'Internal server error.')
         }
+
+        // Activity Log
+        const messageLog = `Invoice gagal diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }

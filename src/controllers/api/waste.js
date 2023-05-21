@@ -5,6 +5,7 @@ import { responseError, responseSuccess } from "../../utils/response";
 import { validate } from '../../middleware/validator';
 import moment from "moment-timezone";
 import WasteType from "../../entity/waste_type";
+import { createActivityLog } from "./activity_log";
 
 export const getListWasteType = async (req, res) => {
     // RESPONSE
@@ -16,7 +17,8 @@ export const getListWasteType = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -47,6 +49,7 @@ export const getListWasteType = async (req, res) => {
             console.log('ERROR: ', error);
             response = responseError(500, 'Internal server error.')
         }
+
         res.status(response.meta.code).send(response);
         res.end();
     }
@@ -62,7 +65,8 @@ export const getListWaste = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -119,6 +123,10 @@ export const getListWaste = async (req, res) => {
             paginator: paginator,
         };
 
+        // Activity Log
+        const messageLog = `Limbah berhasil diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!", result);
 
         res.status(response.meta.code).send(response);
@@ -130,6 +138,11 @@ export const getListWaste = async (req, res) => {
             console.log('ERROR: ', error);
             response = responseError(500, 'Internal server error.')
         }
+
+        // Activity Log
+        const messageLog = `Limbah gagal diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }
@@ -145,7 +158,8 @@ export const getDetailWaste = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -178,6 +192,10 @@ export const getDetailWaste = async (req, res) => {
             throw new Error("Data tidak ditemukan.");
         }
 
+        // Activity Log
+        const messageLog = `Detail Limbah berhasil diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!", report);
 
         res.status(response.meta.code).send(response);
@@ -189,6 +207,11 @@ export const getDetailWaste = async (req, res) => {
             console.log('ERROR: ', error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+
+        // Activity Log
+        const messageLog = `Detail Limbah gagal diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }
@@ -208,7 +231,8 @@ export const createWaste = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -252,6 +276,10 @@ export const createWaste = async (req, res) => {
         await queryRunner.commitTransaction();
         await queryRunner.release();
 
+        // Activity Log
+        const messageLog = `Berhasil menambahkan data limbah oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // RESPONSE
         response = responseSuccess(200, "Success!");
 
@@ -267,6 +295,10 @@ export const createWaste = async (req, res) => {
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
         await queryRunner.release();
+
+        // Activity Log
+        const messageLog = `Gagal menambahkan data limbah oleh ${username}.`;
+        createActivityLog(req, messageLog);
 
         // RESPONSE
         res.status(response.meta.code).send(response);
@@ -289,7 +321,8 @@ export const updateWaste = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -340,6 +373,10 @@ export const updateWaste = async (req, res) => {
         await queryRunner.commitTransaction();
         await queryRunner.release();
 
+        // Activity Log
+        const messageLog = `Berhasil memperbaharui data limbah oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // RESPONSE
         response = responseSuccess(200, "Success!");
 
@@ -352,6 +389,11 @@ export const updateWaste = async (req, res) => {
             console.log(error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+
+        // Activity Log
+        const messageLog = `Gagal memperbaharui data limbah oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
         await queryRunner.release();
@@ -374,7 +416,8 @@ export const deleteWaste = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -395,6 +438,10 @@ export const deleteWaste = async (req, res) => {
             throw new Error('Data tidak ditemukan.');
         }
 
+        // Activity Log
+        const messageLog = `Berhasil menghapus data limbah oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!");
 
         res.status(response.meta.code).send(response);
@@ -406,6 +453,11 @@ export const deleteWaste = async (req, res) => {
             console.log(error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+
+        // Activity Log
+        const messageLog = `Gagal menghapus data limbah oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }

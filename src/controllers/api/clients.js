@@ -7,6 +7,7 @@ import moment from "moment-timezone";
 import Waste from "../../entity/waste";
 import WasteType from "../../entity/waste_type";
 import ClientsWaste from "../../entity/clients_waste";
+import { createActivityLog } from "./activity_log";
 
 export const getListClients = async (req, res) => {
     // RESPONSE
@@ -18,7 +19,8 @@ export const getListClients = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -73,6 +75,10 @@ export const getListClients = async (req, res) => {
             paginator: paginator,
         };
 
+        // Activity Log
+        const messageLog = `Clients berhasil diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!", result);
 
         res.status(response.meta.code).send(response);
@@ -84,6 +90,11 @@ export const getListClients = async (req, res) => {
             console.log('ERROR: ', error);
             response = responseError(500, 'Internal server error.')
         }
+
+        // Activity Log
+        const messageLog = `Clients gagal diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+        
         res.status(response.meta.code).send(response);
         res.end();
     }
@@ -99,7 +110,8 @@ export const getDetailClients = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -150,6 +162,10 @@ export const getDetailClients = async (req, res) => {
 
         report['waste'] = wasteList;
 
+        // Activity Log
+        const messageLog = `Detail Clients berhasil diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!", report);
 
         res.status(response.meta.code).send(response);
@@ -161,6 +177,11 @@ export const getDetailClients = async (req, res) => {
             console.log('ERROR: ', error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+
+        // Activity Log
+        const messageLog = `Detail Clients gagal diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }
@@ -180,7 +201,8 @@ export const createClients = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -240,6 +262,10 @@ export const createClients = async (req, res) => {
         await queryRunner.commitTransaction();
         await queryRunner.release();
 
+        // Activity Log
+        const messageLog = `Berhasil menambahkan data clients oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // RESPONSE
         response = responseSuccess(200, "Success!");
 
@@ -252,6 +278,11 @@ export const createClients = async (req, res) => {
             console.log(error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+        
+        // Activity Log
+        const messageLog = `Gagal menambahkan data clients oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
         await queryRunner.release();
@@ -277,7 +308,8 @@ export const updateClients = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -355,6 +387,10 @@ export const updateClients = async (req, res) => {
         await queryRunner.commitTransaction();
         await queryRunner.release();
 
+        // Activity Log
+        const messageLog = `Berhasil memperbaharui data clients oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // RESPONSE
         response = responseSuccess(200, "Success!");
 
@@ -367,6 +403,11 @@ export const updateClients = async (req, res) => {
             console.log(error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+
+        // Activity Log
+        const messageLog = `Gagal memperbaharui data clients oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
         await queryRunner.release();
@@ -389,7 +430,8 @@ export const deleteClients = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -410,6 +452,10 @@ export const deleteClients = async (req, res) => {
             throw new Error('Data tidak ditemukan.');
         }
 
+        // Activity Log
+        const messageLog = `Berhasil menghapus data clients oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!");
 
         res.status(response.meta.code).send(response);
@@ -421,6 +467,11 @@ export const deleteClients = async (req, res) => {
             console.log(error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+
+        // Activity Log
+        const messageLog = `Gagal menghapus data clients oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }

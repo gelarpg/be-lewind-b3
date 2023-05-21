@@ -8,6 +8,7 @@ import TransportationDocuments from "../../entity/transportation_documents";
 import { checkAndCreateDirectory } from "../../middleware/helper";
 import fs from 'fs';
 import TransportationLicense from "../../entity/transportation_license";
+import { createActivityLog } from "./activity_log";
 
 export const getListTransportationType = async (req, res) => {
     // RESPONSE
@@ -19,7 +20,8 @@ export const getListTransportationType = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -65,7 +67,8 @@ export const getListTransportation = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -123,6 +126,10 @@ export const getListTransportation = async (req, res) => {
             paginator: paginator,
         };
 
+        // Activity Log
+        const messageLog = `Transportation berhasil diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!", result);
 
         res.status(response.meta.code).send(response);
@@ -134,6 +141,11 @@ export const getListTransportation = async (req, res) => {
             console.log('ERROR: ', error);
             response = responseError(500, 'Internal server error.')
         }
+
+        // Activity Log
+        const messageLog = `Transportation gagal diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }
@@ -149,7 +161,8 @@ export const getDetailTransportation = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -200,6 +213,10 @@ export const getDetailTransportation = async (req, res) => {
 
         // report['documents'] = documents;
 
+        // Activity Log
+        const messageLog = `Detail Transportation berhasil diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!", report);
 
         res.status(response.meta.code).send(response);
@@ -211,6 +228,11 @@ export const getDetailTransportation = async (req, res) => {
             console.log('ERROR: ', error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+
+        // Activity Log
+        const messageLog = `Detail Transportation gagal diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }
@@ -230,7 +252,8 @@ export const createTransportation = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -327,6 +350,10 @@ export const createTransportation = async (req, res) => {
         await queryRunner.commitTransaction();
         await queryRunner.release();
 
+        // Activity Log
+        const messageLog = `Berhasil menambahkan data transportation oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // RESPONSE
         response = responseSuccess(200, "Success!");
 
@@ -339,6 +366,11 @@ export const createTransportation = async (req, res) => {
             console.log(error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+
+        // Activity Log
+        const messageLog = `Gagal menambahkan data transportation oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
         await queryRunner.release();
@@ -364,7 +396,8 @@ export const updateTransportation = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -499,6 +532,10 @@ export const updateTransportation = async (req, res) => {
         await queryRunner.commitTransaction();
         await queryRunner.release();
 
+        // Activity Log
+        const messageLog = `Berhasil memperbaharui data transportation oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // RESPONSE
         response = responseSuccess(200, "Success!");
 
@@ -511,6 +548,11 @@ export const updateTransportation = async (req, res) => {
             console.log(error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+
+        // Activity Log
+        const messageLog = `Gagal memperbaharui data transportation oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
         await queryRunner.release();
@@ -533,7 +575,8 @@ export const deleteTransportation = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -562,6 +605,10 @@ export const deleteTransportation = async (req, res) => {
             deleted_at: moment()
         });
 
+        // Activity Log
+        const messageLog = `Berhasil menghapus data transportation oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!");
 
         res.status(response.meta.code).send(response);
@@ -573,6 +620,11 @@ export const deleteTransportation = async (req, res) => {
             console.log(error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+
+        // Activity Log
+        const messageLog = `Gagal menghapus data transportation oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }

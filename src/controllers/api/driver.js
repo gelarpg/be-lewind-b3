@@ -7,6 +7,7 @@ import moment from "moment-timezone";
 import DriverDocuments from "../../entity/driver_documents";
 import fs from 'fs';
 import { checkAndCreateDirectory } from "../../middleware/helper";
+import { createActivityLog } from "./activity_log";
 
 export const getListDriver = async (req, res) => {
     // RESPONSE
@@ -18,7 +19,8 @@ export const getListDriver = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -73,6 +75,10 @@ export const getListDriver = async (req, res) => {
             paginator: paginator,
         };
 
+        // Activity Log
+        const messageLog = `Driver berhasil diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!", result);
 
         res.status(response.meta.code).send(response);
@@ -84,6 +90,11 @@ export const getListDriver = async (req, res) => {
             console.log('ERROR: ', error);
             response = responseError(500, 'Internal server error.')
         }
+
+        // Activity Log
+        const messageLog = `Driver gagal diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }
@@ -99,7 +110,8 @@ export const getDetailDriver = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -146,6 +158,10 @@ export const getDetailDriver = async (req, res) => {
 
         report['documents'] = documents;
 
+        // Activity Log
+        const messageLog = `Detail Driver berhasil diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!", report);
 
         res.status(response.meta.code).send(response);
@@ -157,6 +173,11 @@ export const getDetailDriver = async (req, res) => {
             console.log('ERROR: ', error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+
+        // Activity Log
+        const messageLog = `Detail Driver gagal diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }
@@ -176,7 +197,8 @@ export const createDriver = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -256,6 +278,10 @@ export const createDriver = async (req, res) => {
         await queryRunner.commitTransaction();
         await queryRunner.release();
 
+        // Activity Log
+        const messageLog = `Berhasil menambahkan data driver oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // RESPONSE
         response = responseSuccess(200, "Success!");
 
@@ -268,6 +294,11 @@ export const createDriver = async (req, res) => {
             console.log(error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+        
+        // Activity Log
+        const messageLog = `Gagal menambahkan data driver oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
         await queryRunner.release();
@@ -293,7 +324,8 @@ export const updateDriver = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -426,6 +458,10 @@ export const updateDriver = async (req, res) => {
         await queryRunner.commitTransaction();
         await queryRunner.release();
 
+        // Activity Log
+        const messageLog = `Berhasil memperbaharui data driver oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // RESPONSE
         response = responseSuccess(200, "Success!");
 
@@ -438,6 +474,11 @@ export const updateDriver = async (req, res) => {
             console.log(error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+
+        // Activity Log
+        const messageLog = `Gagal memperbaharui data driver oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
         await queryRunner.release();
@@ -460,7 +501,8 @@ export const deleteDriver = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -481,6 +523,10 @@ export const deleteDriver = async (req, res) => {
             throw new Error('Data tidak ditemukan.');
         }
 
+        // Activity Log
+        const messageLog = `Berhasil menghapus data driver oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!");
 
         res.status(response.meta.code).send(response);
@@ -492,6 +538,11 @@ export const deleteDriver = async (req, res) => {
             console.log(error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+
+        // Activity Log
+        const messageLog = `Gagal menghapus data driver oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }

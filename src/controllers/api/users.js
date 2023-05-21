@@ -5,6 +5,7 @@ import { responseError, responseSuccess } from "../../utils/response";
 import { validate } from '../../middleware/validator';
 import Roles from "../../entity/roles";
 import moment from "moment-timezone";
+import { createActivityLog } from "./activity_log";
 
 export const getListUsers = async (req, res) => {
     // RESPONSE
@@ -16,7 +17,8 @@ export const getListUsers = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -71,6 +73,10 @@ export const getListUsers = async (req, res) => {
             paginator: paginator,
         };
 
+        // Activity Log
+        const messageLog = `Users berhasil diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!", result);
 
         res.status(response.meta.code).send(response);
@@ -82,6 +88,11 @@ export const getListUsers = async (req, res) => {
             console.log('ERROR: ', error);
             response = responseError(500, 'Internal server error.')
         }
+
+        // Activity Log
+        const messageLog = `Users gagal diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }
@@ -97,7 +108,8 @@ export const getDetailUsers = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -128,6 +140,10 @@ export const getDetailUsers = async (req, res) => {
             throw new Error("Data tidak ditemukan.");
         }
 
+        // Activity Log
+        const messageLog = `Detail Users berhasil diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!", report);
 
         res.status(response.meta.code).send(response);
@@ -139,6 +155,11 @@ export const getDetailUsers = async (req, res) => {
             console.log('ERROR: ', error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+
+        // Activity Log
+        const messageLog = `Detail Users gagal diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }
@@ -158,7 +179,8 @@ export const createUsers = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -203,6 +225,10 @@ export const createUsers = async (req, res) => {
         await queryRunner.commitTransaction();
         await queryRunner.release();
 
+        // Activity Log
+        const messageLog = `Berhasil menambahkan data user oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // RESPONSE
         response = responseSuccess(200, "Success!");
 
@@ -218,6 +244,10 @@ export const createUsers = async (req, res) => {
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
         await queryRunner.release();
+
+        // Activity Log
+        const messageLog = `Gagal menambahkan data user oleh ${username}.`;
+        createActivityLog(req, messageLog);
 
         // RESPONSE
         res.status(response.meta.code).send(response);
@@ -240,7 +270,8 @@ export const updateUsers = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -284,6 +315,10 @@ export const updateUsers = async (req, res) => {
         await queryRunner.commitTransaction();
         await queryRunner.release();
 
+        // Activity Log
+        const messageLog = `Berhasil memperbaharui data user oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // RESPONSE
         response = responseSuccess(200, "Success!");
 
@@ -299,6 +334,11 @@ export const updateUsers = async (req, res) => {
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
         await queryRunner.release();
+
+
+        // Activity Log
+        const messageLog = `Gagal memperbaharui data user oleh ${username}.`;
+        createActivityLog(req, messageLog);
 
         // RESPONSE
         res.status(response.meta.code).send(response);
@@ -318,7 +358,8 @@ export const deleteUsers = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -339,6 +380,10 @@ export const deleteUsers = async (req, res) => {
             throw new Error('Data tidak ditemukan.');
         }
 
+        // Activity Log
+        const messageLog = `Berhasil menghapus data user oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!");
 
         res.status(response.meta.code).send(response);
@@ -350,6 +395,11 @@ export const deleteUsers = async (req, res) => {
             console.log(error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+
+        // Activity Log
+        const messageLog = `Gagal menghapus data user oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }
@@ -369,7 +419,8 @@ export const updateUsersPassword = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {

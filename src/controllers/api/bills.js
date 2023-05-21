@@ -11,6 +11,7 @@ import SubmissionDocuments from "../../entity/submission_documents";
 import WasteType from "../../entity/waste_type";
 import SubmissionDetails from "../../entity/submission_details";
 import ClientsWaste from "../../entity/clients_waste";
+import { createActivityLog } from "./activity_log";
 
 export const getListBills = async (req, res) => {
     // RESPONSE
@@ -22,7 +23,8 @@ export const getListBills = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -106,6 +108,10 @@ export const getListBills = async (req, res) => {
             paginator: paginator,
         };
 
+        // Activity Log
+        const messageLog = `Tagihan berhasil diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!", result);
 
         res.status(response.meta.code).send(response);
@@ -117,6 +123,11 @@ export const getListBills = async (req, res) => {
             console.log('ERROR: ', error);
             response = responseError(500, 'Internal server error.')
         }
+
+        // Activity Log
+        const messageLog = `Tagihan gagal diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }
@@ -132,7 +143,8 @@ export const getDetailBills = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -234,6 +246,11 @@ export const getDetailBills = async (req, res) => {
 
         report['submission_details'] = submissionDetails;
 
+
+        // Activity Log
+        const messageLog = `Detail Tagihan berhasil diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!", report);
 
         res.status(response.meta.code).send(response);
@@ -245,6 +262,11 @@ export const getDetailBills = async (req, res) => {
             console.log('ERROR: ', error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+
+        // Activity Log
+        const messageLog = `Detail Tagihan gagal diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }

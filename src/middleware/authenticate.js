@@ -20,9 +20,8 @@ const auth = async (req, res, next) => {
                     req.authorization = 'Bearer ' + token;
                     req.user = {
                         id: decoded.user_id,
-                        parent_id: decoded.parent_id,
-                        polda_id: decoded.polda_id,
-                        polres_id: decoded.polres_id,
+                        username: decoded.username,
+                        email: decoded.email,
                         role: decoded.role
                     }
                     next();

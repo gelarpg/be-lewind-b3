@@ -16,6 +16,7 @@ import WasteType from "../../entity/waste_type";
 import { calculateDashboardInput } from "./dashboard";
 import SubmissionDetails from "../../entity/submission_details";
 import ClientsWaste from "../../entity/clients_waste";
+import { createActivityLog } from "./activity_log";
 
 export const getListSubmissionStatus = async (req, res) => {
     // RESPONSE
@@ -27,7 +28,8 @@ export const getListSubmissionStatus = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -73,7 +75,8 @@ export const getListSubmission = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -147,6 +150,10 @@ export const getListSubmission = async (req, res) => {
             paginator: paginator,
         };
 
+        // Activity Log
+        const messageLog = `Pengajuan berhasil diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!", result);
 
         res.status(response.meta.code).send(response);
@@ -158,6 +165,11 @@ export const getListSubmission = async (req, res) => {
             console.log('ERROR: ', error);
             response = responseError(500, 'Internal server error.')
         }
+
+        // Activity Log
+        const messageLog = `Pengajuan gagal diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+        
         res.status(response.meta.code).send(response);
         res.end();
     }
@@ -173,7 +185,8 @@ export const getDetailSubmission = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -273,6 +286,10 @@ export const getDetailSubmission = async (req, res) => {
 
         report['submission_details'] = submissionDetails;
 
+        // Activity Log
+        const messageLog = `Detail Pengajuan berhasil diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!", report);
 
         res.status(response.meta.code).send(response);
@@ -284,6 +301,11 @@ export const getDetailSubmission = async (req, res) => {
             console.log('ERROR: ', error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+
+        // Activity Log
+        const messageLog = `Detail Pengajuan gagal diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }
@@ -303,7 +325,8 @@ export const createSubmission = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -521,6 +544,10 @@ export const createSubmission = async (req, res) => {
         await queryRunner.commitTransaction();
         await queryRunner.release();
 
+        // Activity Log
+        const messageLog = `Berhasil menambahkan data pengajuan oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // RESPONSE
         response = responseSuccess(200, "Success!");
 
@@ -536,6 +563,10 @@ export const createSubmission = async (req, res) => {
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
         await queryRunner.release();
+
+        // Activity Log
+        const messageLog = `Gagal menambahkan data pengajuan oleh ${username}.`;
+        createActivityLog(req, messageLog);
 
         // RESPONSE
         res.status(response.meta.code).send(response);
@@ -558,7 +589,8 @@ export const updateSubmission = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -843,6 +875,10 @@ export const updateSubmission = async (req, res) => {
         await queryRunner.commitTransaction();
         await queryRunner.release();
 
+        // Activity Log
+        const messageLog = `Berhasil memperbaharui data pengajuan oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // RESPONSE
         response = responseSuccess(200, "Success!");
 
@@ -858,6 +894,10 @@ export const updateSubmission = async (req, res) => {
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
         await queryRunner.release();
+
+        // Activity Log
+        const messageLog = `Gagal memperbaharui data pengajuan oleh ${username}.`;
+        createActivityLog(req, messageLog);
 
         // RESPONSE
         res.status(response.meta.code).send(response);
@@ -880,7 +920,8 @@ export const approvalSubmission = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -957,7 +998,8 @@ export const deleteSubmission = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -1005,6 +1047,10 @@ export const deleteSubmission = async (req, res) => {
         await queryRunner.commitTransaction();
         await queryRunner.release();
 
+        // Activity Log
+        const messageLog = `Berhasil menghapus data pengajuan oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!");
 
         res.status(response.meta.code).send(response);
@@ -1020,6 +1066,10 @@ export const deleteSubmission = async (req, res) => {
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
         await queryRunner.release();
+
+        // Activity Log
+        const messageLog = `Gagal menghapus data pengajuan oleh ${username}.`;
+        createActivityLog(req, messageLog);
 
         res.status(response.meta.code).send(response);
         res.end();

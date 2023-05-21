@@ -5,6 +5,7 @@ import { validate } from '../../middleware/validator';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { responseError, responseSuccess } from "../../utils/response";
+import { createActivityLog } from "./activity_log";
 
 export const login = async (req, res) => {
     // RESPONSE
@@ -60,7 +61,8 @@ export const login = async (req, res) => {
         const jwtBody = {
             user_id: user.id,
             role: user.roles_slug,
-            username,
+            username: user.username,
+            email: user.email
         }
         const token = jwt.sign(jwtBody, process.env.TOKEN_KEY, {
             expiresIn: remember ? "1d" : "2h",
@@ -69,6 +71,10 @@ export const login = async (req, res) => {
         let result = {
             token: token
         }
+
+        // Activity Log
+        const messageLog = `User ${username} berhasil melakukan login.`;
+        createActivityLog(req, messageLog);
 
         response = responseSuccess(200, "Success!", result);
 
@@ -81,6 +87,11 @@ export const login = async (req, res) => {
             console.log(error);
             response = responseError(500, 'Internal server error.')
         }
+
+        // Activity Log
+        const messageLog = `User ${req?.body?.username} gagal melakukan login.`;
+        createActivityLog(req, messageLog, error.message);
+
         res.status(response.meta.code).send(response);
         res.end();
     }

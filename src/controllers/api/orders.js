@@ -14,6 +14,7 @@ import { checkAndCreateDirectory } from "../../middleware/helper";
 import fs from 'fs';
 import SubmissionDetails from "../../entity/submission_details";
 import ClientsWaste from "../../entity/clients_waste";
+import { createActivityLog } from "./activity_log";
 
 export const getListOrders = async (req, res) => {
     // RESPONSE
@@ -25,7 +26,8 @@ export const getListOrders = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -108,6 +110,10 @@ export const getListOrders = async (req, res) => {
             paginator: paginator,
         };
 
+        // Activity Log
+        const messageLog = `Rekap Order berhasil diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!", result);
 
         res.status(response.meta.code).send(response);
@@ -119,6 +125,11 @@ export const getListOrders = async (req, res) => {
             console.log('ERROR: ', error);
             response = responseError(500, 'Internal server error.')
         }
+
+        // Activity Log
+        const messageLog = `Rekap Order gagal diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }
@@ -134,7 +145,8 @@ export const getDetailOrder = async (req, res) => {
 
     // USERS
     let {
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -236,6 +248,10 @@ export const getDetailOrder = async (req, res) => {
 
         report['submission_details'] = submissionDetails;
 
+        // Activity Log
+        const messageLog = `Detail Rekap Order berhasil diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         response = responseSuccess(200, "Success!", report);
 
         res.status(response.meta.code).send(response);
@@ -247,6 +263,11 @@ export const getDetailOrder = async (req, res) => {
             console.log('ERROR: ', error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+
+        // Activity Log
+        const messageLog = `Detail Rekap Order gagal diakses oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         res.status(response.meta.code).send(response);
         res.end();
     }
@@ -266,7 +287,8 @@ export const updateOrderStatus = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -307,6 +329,10 @@ export const updateOrderStatus = async (req, res) => {
         await queryRunner.commitTransaction();
         await queryRunner.release();
 
+        // Activity Log
+        const messageLog = `Berhasil memperbaharui data rekap order oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // RESPONSE
         response = responseSuccess(200, "Success!");
 
@@ -319,6 +345,11 @@ export const updateOrderStatus = async (req, res) => {
             console.log(error);
             response = responseError(500, 'Terjadi kesalahan pada server.')
         }
+
+        // Activity Log
+        const messageLog = `Gagal memperbaharui data rekap order oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
         await queryRunner.release();
@@ -344,7 +375,8 @@ export const updateOrders = async (req, res) => {
     // USERS
     let {
         id,
-        role
+        role,
+        username
     } = req.user;
 
     try {
@@ -555,6 +587,10 @@ export const updateOrders = async (req, res) => {
         await queryRunner.commitTransaction();
         await queryRunner.release();
 
+        // Activity Log
+        const messageLog = `Berhasil memperbaharui data rekap order oleh ${username}.`;
+        createActivityLog(req, messageLog);
+
         // RESPONSE
         response = responseSuccess(200, "Success!");
 
@@ -570,6 +606,10 @@ export const updateOrders = async (req, res) => {
         // COMMIT TRANSACTION
         await queryRunner.rollbackTransaction();
         await queryRunner.release();
+
+        // Activity Log
+        const messageLog = `Gagal memperbaharui data rekap order oleh ${username}.`;
+        createActivityLog(req, messageLog);
 
         // RESPONSE
         res.status(response.meta.code).send(response);
