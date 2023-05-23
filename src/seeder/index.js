@@ -215,6 +215,39 @@ const seeder = async (req, res) => {
             console.log("SUCCESS CREATED DATA WASTE TYPE");
         }
 
+        let findUserKeuangan = await userRepository.findOne({username: 'admin_keuangan'});
+        if (!findUserKeuangan) {
+            console.log("CREATE DATA USERS ADMIN KEUANGAN");
+
+            let role5 = {
+                id: 5,
+                name: "Admin Keuangan",
+                slug: "admin_keuangan",
+                created_at: new Date(),
+                updated_at: new Date()
+            };
+
+            let roles5 = await roleRepository.save(role5);
+
+            let admin5 = {
+                name: 'Admin Keuangan',
+                first_name: 'Admin',
+                last_name: 'Keuangan',
+                email: 'adminkeuangan@b3.id',
+                password: hashSync('P@ssw0rd1234567', 13),
+                phone: '',
+                ip: null,
+                active: true,
+                roles: [roles5],
+                created_at: new Date,
+                updated_at: new Date
+            };
+
+            await userRepository.save(admin5);
+
+            console.log("SUCCESS CREATED DATA USERS ADMIN KEUANGAN");
+        }
+
     } catch (error) {
         console.log("Error seed", error);
     }
