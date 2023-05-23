@@ -302,10 +302,12 @@ export const generateInvoice = async (req, res) => {
 
         await pdf.create(document, options)
             .then((res) => {
-                console.log(res);
+                return res;
             })
             .catch((error) => {
                 console.error(error);
+                statusCode = 400;
+                throw new Error("Fail to generate pdf")
             });
 
         await connection
