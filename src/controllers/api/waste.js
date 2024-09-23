@@ -218,61 +218,50 @@ export const getDetailWaste = async (req, res) => {
 }
 
 export const createWaste = async (req, res) => {
-    // RESPONSE
-    let response = {}
+    let response = {};
     let statusCode = 500;
 
-    // CREATE TYPEORM CONNECTION
     const connection = getConnection();
     const queryRunner = connection.createQueryRunner();
 
     await queryRunner.startTransaction();
 
-    // USERS
-    let {
-        id,
-        role,
-        username
-    } = req.user;
+    const { id, role, username } = req.user;
 
     try {
         const errors = await validate(req).array();
         if (errors.length > 0) {
             statusCode = 400;
-            throw new Error(errors[0].msg)
+            throw new Error(errors[0].msg);
         }
 
-        let checkCode = await queryRunner.manager
-            .findOne(Waste, { waste_code: req.body.code, deleted_at: null });
+        // Check if waste code exists
+        console.log("Checking waste code:", req.body.code);
+        const checkCode = await queryRunner.manager.findOne(Waste, {
+            where: { waste_code: req.body.code, deleted_at: null }
+        });
 
         if (checkCode) {
             statusCode = 400;
             throw new Error("Kode limbah sudah tersedia.");
         }
 
-        // Request Body
-        let { body } = req;
-
         // Create Data
-        let data = {
-            name: body.name,
-            waste_code: body.code,
-            waste_type_id: body.type,
-            weight_unit: body.weight_unit,
-            price_unit: body.price_unit,
+        const data = {
+            name: req.body.name,
+            waste_code: req.body.code,
+            waste_type_id: req.body.type,
+            weight_unit: req.body.weight_unit,
+            price_unit: req.body.price_unit,
             created_at: moment.utc(),
             updated_at: moment.utc()
-        }
+        };
 
-        let storeWaste = await queryRunner.manager
-            .getRepository(Waste)
-            .save(data);
-
+        const storeWaste = await queryRunner.manager.getRepository(Waste).save(data);
         if (!storeWaste) {
             throw new Error('Fail to create data.');
         }
 
-        // COMMIT TRANSACTION
         await queryRunner.commitTransaction();
         await queryRunner.release();
 
@@ -280,36 +269,26 @@ export const createWaste = async (req, res) => {
         const messageLog = `Berhasil menambahkan data limbah oleh ${username}.`;
         createActivityLog(req, messageLog);
 
-        // RESPONSE
         response = responseSuccess(200, "Success!");
-
         res.status(response.meta.code).send(response);
-        res.end();
+
     } catch (error) {
-        if (statusCode != 500) {
-            response = responseError(statusCode, error);
-        } else {
-            console.log(error);
-            response = responseError(500, 'Terjadi kesalahan pada server.')
-        }
-        // COMMIT TRANSACTION
+        console.error("Error occurred:", error);
         await queryRunner.rollbackTransaction();
         await queryRunner.release();
 
-        // Activity Log
         const messageLog = `Gagal menambahkan data limbah oleh ${username}.`;
         createActivityLog(req, messageLog);
 
-        // RESPONSE
+        response = (statusCode !== 500) ? responseError(statusCode, error) : responseError(500, 'Terjadi kesalahan pada server.');
         res.status(response.meta.code).send(response);
-        res.end();
     }
-
 }
+
 
 export const updateWaste = async (req, res) => {
     // RESPONSE
-    let response = {}
+    let response = {};
     let statusCode = 500;
 
     // CREATE TYPEORM CONNECTION
@@ -319,33 +298,34 @@ export const updateWaste = async (req, res) => {
     await queryRunner.startTransaction();
 
     // USERS
-    let {
-        id,
-        role,
-        username
-    } = req.user;
+    let { id, role, username } = req.user;
 
     try {
         const errors = await validate(req).array();
         if (errors.length > 0) {
             statusCode = 400;
-            throw new Error(errors[0].msg)
+            throw new Error(errors[0].msg);
         }
 
-        let checkCode = await queryRunner.manager
-            .findOne(Waste, { waste_code: req.body.code, deleted_at: null });
+        // // Cek Kode Limbah
+        // let checkCode = await queryRunner.manager.findOne(Waste, {
+        //     where: {
+        //         waste_code: req.body.code,
+        //         deleted_at: null
+        //     }
+        // });
 
-        if (checkCode) {
-            statusCode = 400;
-            throw new Error("Kode limbah sudah tersedia.");
-        }
+        // // Jika kode limbah sudah ada, kirimkan informasi kode limbah yang sudah ada
+        // if (checkCode) {
+        //     statusCode = 400;
+        //     throw new Error(`Kode limbah sudah tersedia: ${checkCode.waste_code}`);
+        // }
 
         // Request Body
         let { body, params } = req;
 
         // Get Existing Data
-        let waste = await queryRunner.manager
-            .findOne(Waste, { id: params.id, deleted_at: null });
+        let waste = await queryRunner.manager.findOne(Waste, { where: { id: params.id, deleted_at: null } });
 
         if (!waste) {
             statusCode = 404;
@@ -361,12 +341,12 @@ export const updateWaste = async (req, res) => {
             weight_unit: body.weight_unit,
             price_unit: body.price_unit,
             updated_at: moment.utc()
-        }
+        };
 
         const updateWaste = await queryRunner.manager.save(Waste, dataUpdated);
 
         if (!updateWaste) {
-            throw new Error('Fail to update data.');
+            throw new Error('Gagal memperbarui data.');
         }
 
         // COMMIT TRANSACTION
@@ -383,18 +363,18 @@ export const updateWaste = async (req, res) => {
         res.status(response.meta.code).send(response);
         res.end();
     } catch (error) {
-        if (statusCode != 500) {
-            response = responseError(statusCode, error);
+        if (statusCode !== 500) {
+            response = responseError(statusCode, error.message);
         } else {
             console.log(error);
-            response = responseError(500, 'Terjadi kesalahan pada server.')
+            response = responseError(500, 'Terjadi kesalahan pada server.');
         }
 
         // Activity Log
         const messageLog = `Gagal memperbaharui data limbah oleh ${username}.`;
         createActivityLog(req, messageLog);
 
-        // COMMIT TRANSACTION
+        // ROLLBACK TRANSACTION
         await queryRunner.rollbackTransaction();
         await queryRunner.release();
 
@@ -402,8 +382,8 @@ export const updateWaste = async (req, res) => {
         res.status(response.meta.code).send(response);
         res.end();
     }
+};
 
-}
 
 export const deleteWaste = async (req, res) => {
     // RESPONSE
@@ -425,7 +405,7 @@ export const deleteWaste = async (req, res) => {
         let { params } = req;
 
         // Create Data
-        let query = await connection.update(Waste, { id: params.id, deleted_at: null }, {
+        let query = await connection.update(Waste, { id: params.id }, {
             deleted_at: moment()
         });
 

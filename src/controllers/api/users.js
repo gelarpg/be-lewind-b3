@@ -194,7 +194,7 @@ export const createUsers = async (req, res) => {
         let { body } = req;
 
         const dbRole = getRepository(Roles);
-        const roleUser = await dbRole.findOne({ id: body.roles });
+        const roleUser = await dbRole.findOne({ where:{id: body.roles} });
 
         // Query Params
         let {
@@ -286,7 +286,7 @@ export const updateUsers = async (req, res) => {
 
         // Get Existing Data
         let users = await queryRunner.manager
-            .findOne(Users, { id: params.id, deleted_at: null });
+            .findOne(Users, { where:{id: params.id, deleted_at: null} });
 
         if (!users) {
             statusCode = 404;
@@ -294,7 +294,7 @@ export const updateUsers = async (req, res) => {
         }
 
         const dbRole = getRepository(Roles);
-        const roleUser = await dbRole.findOne({ id: body.roles });
+        const roleUser = await dbRole.findOne({ where:{id: body.roles} });
 
         // Create Data
         let dataUpdated = {

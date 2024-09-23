@@ -411,8 +411,10 @@ export const updateTransportation = async (req, res) => {
         let { body, params } = req;
 
         // Get Existing Data
-        let transportation = await queryRunner.manager
-            .findOne(Transportation, { id: params.id, deleted_at: null });
+        let transportation = await queryRunner.manager.findOne(Transportation, {
+            where: { id: params.id, deleted_at: null }
+        });
+        
 
         if (!transportation) {
             statusCode = 404;
@@ -436,97 +438,6 @@ export const updateTransportation = async (req, res) => {
         if (!updateTransportation) {
             throw new Error('Fail to update data.');
         }
-
-        // MAPPING TRANSPORTATION DOCUMENT
-        // let transaportation_documents = [];
-        // let updated_docs = [];
-        // let directory = `public/api/upload/attachments/transportation/${transportation.id}`;
-        // let directoryResult = `/api/upload/attachments/transportation/${transportation.id}`;
-
-        // checkAndCreateDirectory(directory);
-
-        // // STNK
-        // if (body.stnk_file || body.stnk_number || body.stnk_validity_period) {
-        //     let stnk_file_name = null;
-        //     if (body.stnk_file) {
-        //         if (fs.existsSync('./tmp/' + body.stnk_file)) {
-        //             let stnk_file = body.stnk_file;
-        //             stnk_file_name = stnk_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        //             fs.renameSync('./tmp/' + stnk_file, directory + '/' + stnk_file_name);
-        //         } else {
-        //             statusCode = 400;
-        //             throw new Error(`File dengan nama ${body.stnk_file} tidak tersedia.`);
-        //         }
-        //     }
-
-        //     // Get Existing Data
-        //     let transportationDocsSTNK = await queryRunner.manager
-        //         .findOne(TransportationDocuments, { transportation_id: transportation.id, deleted_at: null, type: 'stnk' });
-
-        //     transaportation_documents.push({
-        //         transportation_id: transportation.id,
-        //         type: 'stnk',
-        //         doc_number: body.stnk_number ? body.stnk_number : transportationDocsSTNK.doc_number,
-        //         validity_period: body.stnk_validity_period ? moment(body.stnk_validity_period) : transportationDocsSTNK.validity_period,
-        //         path: stnk_file_name ? directoryResult + '/' + stnk_file_name : transportationDocsSTNK.path,
-        //         created_at: moment(),
-        //         updated_at: moment()
-        //     });
-
-        //     updated_docs.push('stnk');
-        // }
-
-        // Travel Document
-        // if (body.travel_document_file || body.travel_document_number) {
-        //     let travel_document_file_name = null;
-        //     if (body.travel_document_file) {
-        //         if (fs.existsSync('./tmp/' + body.travel_document_file)) {
-        //             let travel_document_file = body.travel_document_file;
-        //             travel_document_file_name = travel_document_file.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        //             fs.renameSync('./tmp/' + travel_document_file, directory + '/' + travel_document_file_name);
-        //         } else {
-        //             statusCode = 400;
-        //             throw new Error(`File dengan nama ${body.travel_document_file} tidak tersedia.`);
-        //         }
-        //     }
-
-        //     // Get Existing Data
-        //     let transportationDocsTDocs = await queryRunner.manager
-        //         .findOne(TransportationDocuments, { transportation_id: transportation.id, deleted_at: null, type: 'travel_document' });
-
-        //     transaportation_documents.push({
-        //         transportation_id: transportation.id,
-        //         type: 'travel_document',
-        //         doc_number: body.travel_document_number ? body.travel_document_number : transportationDocsTDocs.doc_number,
-        //         path: travel_document_file_name ? directoryResult + '/' + travel_document_file_name : transportationDocsTDocs.path,
-        //         created_at: moment(),
-        //         updated_at: moment()
-        //     });
-
-        //     updated_docs.push('travel_document');
-        // }
-
-        // if (transaportation_documents.length > 0) {
-        //     let dropExistingDocs = await queryRunner.manager
-        //         .createQueryBuilder()
-        //         .delete()
-        //         .from(TransportationDocuments)
-        //         .where('transportation_id = :id', { id: transportation.id })
-        //         .andWhere('type IN (:...type)', { type: updated_docs })
-        //         .execute();
-
-        //     if (!dropExistingDocs) {
-        //         throw new Error('Fail to update data.');
-        //     }
-
-        //     let transportationDocuments = await queryRunner.manager
-        //         .getRepository(TransportationDocuments)
-        //         .save(transaportation_documents);
-
-        //     if (!transportationDocuments) {
-        //         throw new Error('Fail to update data.');
-        //     }
-        // }
 
         // COMMIT TRANSACTION
         await queryRunner.commitTransaction();
@@ -571,7 +482,6 @@ export const deleteTransportation = async (req, res) => {
 
     // CREATE TYPEORM CONNECTION
     const connection = getManager();
-
     // USERS
     let {
         id,
@@ -584,24 +494,16 @@ export const deleteTransportation = async (req, res) => {
         let { params } = req;
 
         // Create Data
-        let query = await connection.update(Transportation, { id: params.id, deleted_at: null }, {
+        let query = await connection.update(Transportation, { id: params.id }, {
             deleted_at: moment()
         });
-
-        if (!query) {
-            throw new Error('Gagal menghapus data.');
-        }
-
-        if (query.affected === 0) {
+        console.log(query)
+        if (!query || query.affected === 0) {
             statusCode = 404;
             throw new Error('Data tidak ditemukan.');
         }
 
-        // await connection.update(TransportationDocuments, { transportation_id: params.id, deleted_at: null }, {
-        //     deleted_at: moment()
-        // });
-
-        await connection.update(TransportationLicense, { transportation_id: params.id, deleted_at: null }, {
+        await connection.update(TransportationLicense, { transportation_id: params.id }, {
             deleted_at: moment()
         });
 

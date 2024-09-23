@@ -340,7 +340,7 @@ export const updateDriver = async (req, res) => {
 
         // Get Existing Data
         let driver = await queryRunner.manager
-            .findOne(Driver, { id: params.id, deleted_at: null });
+            .findOne(Driver, { where:{id: params.id, deleted_at: null} });
 
         if (!driver) {
             statusCode = 404;
@@ -387,7 +387,7 @@ export const updateDriver = async (req, res) => {
 
             // Get Existing Data
             let driverDocsKTP = await queryRunner.manager
-                .findOne(DriverDocuments, { driver_id: driver.id, deleted_at: null, type: 'ktp' });
+                .findOne(DriverDocuments, {where:{ driver_id: driver.id, deleted_at: null, type: 'ktp'} });
 
             driver_documents.push({
                 driver_id: driver.id,
@@ -417,7 +417,7 @@ export const updateDriver = async (req, res) => {
 
             // Get Existing Data
             let driverDocsSIM = await queryRunner.manager
-                .findOne(DriverDocuments, { driver_id: driver.id, deleted_at: null, type: 'sim' });
+                .findOne(DriverDocuments, { where:{driver_id: driver.id, deleted_at: null, type: 'sim'} });
 
             driver_documents.push({
                 driver_id: driver.id,
@@ -510,7 +510,7 @@ export const deleteDriver = async (req, res) => {
         let { params } = req;
 
         // Create Data
-        let query = await connection.update(Driver, { id: params.id, deleted_at: null }, {
+        let query = await connection.update(Driver, { id: params.id }, {
             deleted_at: moment()
         });
 

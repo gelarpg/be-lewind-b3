@@ -324,7 +324,7 @@ export const updateClients = async (req, res) => {
 
         // Get Existing Data
         let clients = await queryRunner.manager
-            .findOne(Clients, { id: params.id, deleted_at: null });
+            .findOne(Clients, { where:{id: params.id, deleted_at: null }});
 
         if (!clients) {
             statusCode = 404;
@@ -439,7 +439,7 @@ export const deleteClients = async (req, res) => {
         let { params } = req;
 
         // Create Data
-        let query = await connection.update(Clients, { id: params.id, deleted_at: null }, {
+        let query = await connection.update(Clients, { id: params.id }, {
             deleted_at: moment()
         });
 

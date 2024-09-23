@@ -424,7 +424,7 @@ export const updateTransportationLicense = async (req, res) => {
 
         // Get Existing Data
         let transportationLicense = await queryRunner.manager
-            .findOne(TransportationLicense, { id: params.id, deleted_at: null });
+            .findOne(TransportationLicense, { where:{id: params.id, deleted_at: null} });
 
         if (!transportationLicense) {
             statusCode = 404;
@@ -547,7 +547,7 @@ export const deleteTransportationLicense = async (req, res) => {
         let { params } = req;
 
         // Create Data
-        let query = await connection.update(TransportationLicense, { id: params.id, deleted_at: null }, {
+        let query = await connection.update(TransportationLicense, { id: params.id }, {
             deleted_at: moment()
         });
 
