@@ -406,7 +406,7 @@ export const createSubmission = async (req, res) => {
 
                 for (const item of body.waste) {
                     let wasteDetail = await queryRunner.manager
-                        .findOne(ClientsWaste, { client_id: body.client_id, waste_id: item.waste_id, deleted_at: null });
+                        .findOne(ClientsWaste, { where:{client_id: body.client_id, waste_id: item.waste_id, deleted_at: null} });
 
                     submissionDetails.push({
                         submission_id: storeSubmission.id,
@@ -534,11 +534,20 @@ export const createSubmission = async (req, res) => {
             }
         }
 
-        let calculateDashboard = await calculateDashboardInput(queryRunner, storeSubmission, 'create');
+        // let calculateDashboard = await calculateDashboardInput(queryRunner, storeSubmission, 'create');
 
-        if (!calculateDashboard) {
-            throw new Error('Fail to create data.');
+        // if (!calculateDashboard) {
+        //     throw new Error('Fail to create data.');
+        // }
+        try {
+            let calculateDashboard = await calculateDashboardInput(queryRunner, storeSubmission, 'create');
+            if (!calculateDashboard) {
+                throw new Error('calculateDashboardInput returned a falsy value');
+            }
+        } catch (error) {
+            console.error('Error in calculateDashboardInput:', error);
         }
+        
 
         // COMMIT TRANSACTION
         await queryRunner.commitTransaction();
@@ -605,7 +614,7 @@ export const updateSubmission = async (req, res) => {
 
         // Get Existing Data
         let submission = await queryRunner.manager
-            .findOne(Submission, { id: params.id, deleted_at: null });
+            .findOne(Submission, {where:{ id: params.id, deleted_at: null} });
 
         if (!submission) {
             statusCode = 404;
@@ -684,7 +693,7 @@ export const updateSubmission = async (req, res) => {
 
                 for (const item of body.waste) {
                     let wasteDetail = await queryRunner.manager
-                        .findOne(ClientsWaste, { client_id: body.client_id, waste_id: item.waste_id, deleted_at: null });
+                        .findOne(ClientsWaste, { where:{client_id: body.client_id, waste_id: item.waste_id, deleted_at: null} });
 
                     submissionDetails.push({
                         submission_id: submission.id,
@@ -930,7 +939,7 @@ export const approvalSubmission = async (req, res) => {
 
         // Get Existing Data
         let submission = await queryRunner.manager
-            .findOne(Submission, { id: params.id, deleted_at: null });
+            .findOne(Submission, { where:{id: params.id, deleted_at: null} });
 
         if (!submission) {
             statusCode = 404;
@@ -951,12 +960,15 @@ export const approvalSubmission = async (req, res) => {
             throw new Error('Gagal melakukan perubahan.');
         }
 
-        let calculateDashboard = await calculateDashboardInput(queryRunner, updateSubmissionStatus, 'create');
-
-        if (!calculateDashboard) {
-            throw new Error('Gagal melakukan perubahan.');
+        try {
+            let calculateDashboard = await calculateDashboardInput(queryRunner, storeSubmission, 'create');
+            if (!calculateDashboard) {
+                throw new Error('calculateDashboardInput returned a falsy value');
+            }
+        } catch (error) {
+            console.error('Error in calculateDashboardInput:', error);
         }
-
+        
         // COMMIT TRANSACTION
         await queryRunner.commitTransaction();
         await queryRunner.release();
@@ -1008,7 +1020,7 @@ export const deleteSubmission = async (req, res) => {
 
         // Get Existing Data
         let submission = await queryRunner.manager
-            .findOne(Submission, { id: params.id, deleted_at: null });
+            .findOne(Submission, { where:{id: params.id, deleted_at: null} });
 
         if (!submission) {
             statusCode = 404;
@@ -1037,10 +1049,13 @@ export const deleteSubmission = async (req, res) => {
             throw new Error('Gagal menghapus data.');
         }
 
-        let calculateDashboard = await calculateDashboardInput(queryRunner, updateSubmissionStatus, 'delete');
-
-        if (!calculateDashboard) {
-            throw new Error('Gagal menghapus data.');
+        try {
+            let calculateDashboard = await calculateDashboardInput(queryRunner, storeSubmission, 'create');
+            if (!calculateDashboard) {
+                throw new Error('calculateDashboardInput returned a falsy value');
+            }
+        } catch (error) {
+            console.error('Error in calculateDashboardInput:', error);
         }
 
         // COMMIT TRANSACTION

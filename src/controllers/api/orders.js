@@ -297,7 +297,7 @@ export const updateOrderStatus = async (req, res) => {
 
         // Get Existing Data
         let submission = await queryRunner.manager
-            .findOne(Submission, { id: params.id, deleted_at: null });
+            .findOne(Submission, {where:{ id: params.id, deleted_at: null }});
 
         if (!submission) {
             statusCode = 404;
@@ -321,8 +321,13 @@ export const updateOrderStatus = async (req, res) => {
 
         let calculateDashboard = await calculateDashboardInput(queryRunner, submission, 'create');
 
-        if (!calculateDashboard) {
-            throw new Error('Gagal melakukan perubahan.');
+        try {
+            let calculateDashboard = await calculateDashboardInput(queryRunner, storeSubmission, 'create');
+            if (!calculateDashboard) {
+                throw new Error('calculateDashboardInput returned a falsy value');
+            }
+        } catch (error) {
+            console.error('Error in calculateDashboardInput:', error);
         }
 
         // COMMIT TRANSACTION
@@ -385,7 +390,7 @@ export const updateOrders = async (req, res) => {
 
         // Get Existing Data
         let order = await queryRunner.manager
-            .findOne(Submission, { id: params.id, deleted_at: null });
+            .findOne(Submission, {where:{ id: params.id, deleted_at: null }});
 
         if (!order) {
             statusCode = 404;
